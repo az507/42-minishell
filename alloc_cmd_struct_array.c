@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 14:19:24 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 15:04:23 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 13:22:05 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,17 +80,14 @@ int	alloc_cmd_struct_node(int i, char ***token_arr, t_params *params)
 	if (cmd_words == -1)
 		return (-1);
 	flag = 0;
-	params->cmd_arr[i].stdin_fds = (int *)malloc(sizeof(int));
-	params->cmd_arr[i].stdout_fds = (int *)malloc(sizeof(int));
 	cmd_args = (char **)malloc(sizeof(char *) * (cmd_words + 1));
 	if (!cmd_args || !params->cmd_arr[i].stdin_fds
 		|| !params->cmd_arr[i].stdout_fds)
 		return (-1);
 	cmd_args[cmd_words] = NULL;
-	*(params->cmd_arr[i].stdin_fds) = -2;
-	*(params->cmd_arr[i].stdout_fds) = -2;
+//	open_heredocs_first(*token_arr, i, params);
 	if (open_files_for_redirect(*token_arr, i, params) == -1)
-		return (-1);
+		return (free(cmd_args), -1);
 	assigning_tokens_to_cmd_args(cmd_args, token_arr, cmd_words, &flag);
 	params->cmd_arr[i].cmd_args = cmd_args;
 	return (0);
@@ -115,6 +112,16 @@ int	alloc_cmd_struct_array(t_params *params)
 			cmd_arr[i].cmd_args = NULL;
 		}
 		params->cmd_arr = cmd_arr;
+		i = -1;
+		while (++i < params->cmd_nbr)
+		{
+			params->cmd_arr[i].stdin_fds = (int *)malloc(sizeof(int));
+			params->cmd_arr[i].stdout_fds = (int *)malloc(sizeof(int));
+			*(params->cmd_arr[i].stdin_fds) = -2;
+			*(params->cmd_arr[i].stdout_fds) = -2;
+			open_heredocs_first(i, &temp, params);
+		}
+		temp = params->token_arr;
 		i = -1;
 		while (++i < params->cmd_nbr)
 			if (alloc_cmd_struct_node(i, &temp, params) == -1)

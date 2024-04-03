@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 13:33:43 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 17:36:31 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 17:51:47 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	choose_which_builtin_to_exec(t_params *params, int i, int *exit_status)
 	if (!my_strncmp("echo", params->cmd_arr[i].cmd_args[0], 4))
 		*exit_status = echo_builtin(params->cmd_arr[i].cmd_args);
 	else if (!my_strncmp("pwd", params->cmd_arr[i].cmd_args[0], 3))
-		*exit_status = pwd_builtin();
+		*exit_status = pwd_builtin(*(params->head_env));
 	else if (!my_strncmp("cd", params->cmd_arr[i].cmd_args[0], 2))
 		*exit_status = cd_builtin(params->head_env,
 				params->cmd_arr[i].cmd_args);

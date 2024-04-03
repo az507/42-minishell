@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 12:04:37 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 16:48:55 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 17:27:37 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,20 @@ void	copy_var_len(char **temp, char *token_arr, int *i, t_env *head_env)
 	k = 0;
 	(*temp)++;
 	j = move_ptr_past_var(temp, &head_env);
-	if (j == -1)
-		return ;
+//	if (j == -1)
+//		return ;
 	if ((*temp)[0] && j != 0)
 	{
-		if (!head_env || (!(((*temp)[0] >= 'a' && (*temp)[0] <= 'z')
-			|| ((*temp)[0] >= 'A' && (*temp)[0] <= 'Z'))
-			&& ((*temp)[0] != '_') && ((*temp)[0] != '?')))
+		if (!head_env)
 		{
+			(*temp) += j;
+			return ;
+		}
+		if (!(((*temp)[0] >= 'a' && (*temp)[0] <= 'z')
+			|| ((*temp)[0] >= 'A' && (*temp)[0] <= 'Z'))
+			&& ((*temp)[0] != '_') && ((*temp)[0] != '?'))
+		{
+			token_arr[++(*i)] = '$'; 
 			(*temp) += j;
 			return ;
 		}
@@ -51,11 +57,13 @@ void	copy_regular_len(char **temp, char *token_arr, int *i)
 	}
 }
 
-void	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
+int	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
 {
 	int	i;
+	int	flag;
 
 	i = -1;
+	flag = 0;
 	while (is_whitespace(**temp))
 		(*temp)++;
 	if (**temp == '|' || **temp == '<' || **temp == '>')
@@ -66,7 +74,7 @@ void	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
 			&& **temp && !is_whitespace(**temp))
 		{
 			if (**temp == 39 || **temp == '"')
-				copy_quote_len(temp, &i,
+				flag = copy_quote_len(temp, &i,
 					token_arr, head_env);
 			else if (**temp == '$')
 				copy_var_len(temp, token_arr,
@@ -75,4 +83,5 @@ void	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
 				copy_regular_len(temp, token_arr, &i);
 		}
 	}
+	return (flag);
 }

@@ -6,20 +6,20 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 11:27:27 by achak             #+#    #+#             */
-/*   Updated: 2024/03/30 12:50:52 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 12:56:57 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
+	//if (s && *s)
 int	my_strlen(char *s)
 {
 	int	len;
 
 	len = 0;
-	if (s && *s)
-		while (*s++)
-			len++;
+	while (*s++)
+		len++;
 	return (len);
 }
 

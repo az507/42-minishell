@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:40:05 by achak             #+#    #+#             */
-/*   Updated: 2024/03/30 12:53:53 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 17:45:59 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,19 +68,28 @@ int	echo_builtin(char **cmd_args)
 	return (0);
 }
 
-int	pwd_builtin(void)
+int	pwd_builtin(t_env *head_env)
 {
-	char	*cwd;
+//	char	*cwd;
 
-	cwd = getcwd(NULL, 300);
-	if (!cwd)
+	while (head_env)
 	{
-		perror("pwd");
-		return (2);
+		if (!my_strncmp("PWD", head_env->key, 3))
+			break ;
+		head_env = head_env->next;
 	}
-	else
-		printf("%s\n", cwd);
-	free(cwd);
+	if (head_env)
+		if (head_env->value)
+			printf("%s\n", head_env->value);
+//	cwd = getcwd(NULL, 300);
+//	if (!cwd)
+//	{
+//		perror("pwd");
+//		return (2);
+//	}
+//	else
+//		printf("%s\n", cwd);
+//	free(cwd);
 	return (0);
 }
 

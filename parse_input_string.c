@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:36:16 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 19:13:39 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 17:27:46 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,20 +38,10 @@ void	count_meta_char(char **temp_line, int *token_len)
 void	count_quote_len(char **temp_line, char quote, int *token_len,
 		t_env *head_env)
 {
-	int	flag;
-
-	if (quote == 39)
-		flag = 0;
-	else
-		flag = -1;
 	(*temp_line)++;
 	while (**temp_line != quote && **temp_line)
 	{
-		if (!flag)
-			flag = 1;
-		else
-			flag = 2;
-		if (**temp_line == '$' && flag == 2)
+		if (**temp_line == '$' && quote == '"')
 		{
 			count_var_len(temp_line, token_len, head_env);
 			continue ;
@@ -61,6 +51,10 @@ void	count_quote_len(char **temp_line, char quote, int *token_len,
 	}
 	if (**temp_line == quote)
 		(*temp_line)++;
+//	(*token_len)++;
+	// ^^ This is for placing a double quote in front of every word that is 
+	// quoted, will be removed if the token in front of this current token
+	// is not a heredoc, will stay if it is heredoc
 }
 
 //	if (flag <= 0)
@@ -93,6 +87,30 @@ int	count_token_len(char *temp, t_env *head_env)
 	return (token_len);
 }
 
+void	check_if_heredoc_prev_token(char **token)
+{
+	int		j;
+	char	*new_token;
+
+	j = -1;
+	new_token = NULL;
+	if (my_strlen(*token) == 3)
+	{
+		if ((*token)[0] == 39 && (*token)[1] == '<' && (*token)[2] == '<')
+		{
+			new_token = malloc(sizeof(char) * 5);
+			if (!new_token)
+				return ;
+			new_token[4] = '\0';
+			while ((*token)[++j])
+				new_token[j] = (*token)[j];
+			new_token[j] = '"';
+			free(*token);
+			*token = new_token;
+		}
+	}
+}
+
 void	alloc_token_by_index(char **temp_line, char **token_arr, int i,
 		t_env *head_env)
 {
@@ -111,7 +129,10 @@ void	alloc_token_by_index(char **temp_line, char **token_arr, int i,
 	}
 	token_arr[i][token_len] = '\0';
 	if (token_len)
-		copy_token_from_line(temp_line, token_arr[i], head_env);
+	{
+		if (copy_token_from_line(temp_line, token_arr[i], head_env) && i)
+			check_if_heredoc_prev_token(&token_arr[i - 1]);
+	}
 	else
 	{
 		while (is_whitespace(**temp_line) && **temp_line)

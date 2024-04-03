@@ -6,45 +6,45 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 14:39:48 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 15:04:09 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 16:30:16 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-int	check_syntax_around_pipe(t_params *params, int i, int *nbr)
+int	check_syntax_around_pipe(char **token_arr, int i, int *nbr)
 {
-	if (params->token_arr[i][0] == 39 && params->token_arr[i][1] == '|')
+	if (token_arr[i][0] == 39 && token_arr[i][1] == '|')
 	{
-		if (check_next_token_pipe(params->token_arr, i))
+		if (check_next_token_pipe(token_arr, i))
 			(*nbr)++;
 		else
 		{
 			write(STDERR_FILENO, "syntax error near '|'\n", 22);
-			handle_exit_failure(NULL, params);
+			handle_exit_failure(token_arr, NULL);
 			return (-1);
 		}
 	}
 	return (0);
 }
 
-int	check_syntax_around_redir(t_params *params, int i)
+int	check_syntax_around_redir(char **token_arr, int i)
 {
-	if (params->token_arr[i][0] == 39 && (params->token_arr[i][1] == '<'
-		|| params->token_arr[i][1] == '>'))
+	if (token_arr[i][0] == 39 && (token_arr[i][1] == '<'
+		|| token_arr[i][1] == '>'))
 	{
-		if (check_next_token_null(params->token_arr, i))
+		if (check_next_token_null(token_arr, i))
 		{
 			ft_dprintf(STDERR_FILENO, "syntax error near %s\n",
-				params->token_arr[i] + 1);
-			handle_exit_failure(NULL, params);
+				token_arr[i] + 1);
+			handle_exit_failure(token_arr, NULL);
 			return (-1);
 		}
 	}
 	return (0);
 }
 
-int	nbr_of_pipes(t_params *params)
+int	nbr_of_pipes(char **token_arr)
 {
 	int	nbr;
 	int	i;
@@ -53,13 +53,13 @@ int	nbr_of_pipes(t_params *params)
 	nbr = 0;
 	i = -1;
 	flag = 0;
-	while (params->token_arr[++i])
+	while (token_arr[++i])
 	{
-		if (params->token_arr[i] && my_strlen(params->token_arr[i]) >= 2)
+		if (token_arr[i] && my_strlen(token_arr[i]) >= 2)
 		{
-			if (check_syntax_around_pipe(params, i, &nbr) == -1)
+			if (check_syntax_around_pipe(token_arr, i, &nbr) == -1)
 				return (-1);
-			else if (check_syntax_around_redir(params, i) == -1)
+			else if (check_syntax_around_redir(token_arr, i) == -1)
 				return (-1);
 		}
 	}

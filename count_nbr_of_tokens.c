@@ -6,19 +6,22 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:40:40 by achak             #+#    #+#             */
-/*   Updated: 2024/03/30 19:30:04 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 12:59:33 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
+//	if (*temp + 1)
+//		(*temp)++;
+//	printf("*temp = %s\n", *temp);
 void	iterate_thru_quotes(char **temp, char quote, int *count, int *flag)
 {
 	(*temp)++;
 	while (**temp != quote && **temp)
 		(*temp)++;
-	if (*temp + 1)
-		(*temp)++;
+	if (**temp == quote)
+		(*temp)++;		
 	if (!*flag)
 	{
 		(*count)++;

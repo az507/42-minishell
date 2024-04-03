@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 19:48:11 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 16:48:40 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 17:19:18 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	copy_meta_char(char **temp, char *token_arr, int *i)
 	(*temp)++;
 }
 
-void	copy_quote_len(char **temp, int *i, char *token_arr, t_env *head_env)
+int	copy_quote_len(char **temp, int *i, char *token_arr, t_env *head_env)
 {
 	char	quote;
 
@@ -44,7 +44,7 @@ void	copy_quote_len(char **temp, int *i, char *token_arr, t_env *head_env)
 	(*temp)++;
 	while (**temp != quote && **temp)
 	{
-		if (**temp == '$')
+		if (**temp == '$' && quote == '"')
 		{
 			copy_var_len(temp, token_arr, i, head_env);
 			continue ;
@@ -54,6 +54,7 @@ void	copy_quote_len(char **temp, int *i, char *token_arr, t_env *head_env)
 	}
 	if (**temp == quote)
 		(*temp)++;
+	return (1);
 }
 
 int	move_ptr_past_var(char **temp, t_env **head_env)
@@ -71,10 +72,10 @@ int	move_ptr_past_var(char **temp, t_env **head_env)
 			break ;
 		*head_env = (*head_env)->next;
 	}
-	if (!*head_env)
-	{
-		(*temp) += j;
-		return (-1);
-	}
+//	if (!*head_env)
+//	{
+//		(*temp) += j;
+//		return (-1);
+//	}
 	return (j);
 }

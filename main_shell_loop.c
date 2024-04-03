@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 14:00:05 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 18:47:54 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 17:56:21 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,16 @@
 
 void	main_shell_loop(t_params *params, char *line_read)
 {
-	int			pipe_nbr;
+	int		pipe_nbr;
+	char	**token_arr;
 
 	add_history(line_read);
-	params->token_arr = parse_input_string(line_read, *(params->head_env));
+	token_arr = parse_input_string(line_read, *(params->head_env));
 	params->cmd_arr = NULL;
-	pipe_nbr = nbr_of_pipes(params);
+	pipe_nbr = nbr_of_pipes(token_arr);
 	if (pipe_nbr == -1)
 		return ;
+	params->token_arr = token_arr;
 	params->cmd_nbr = pipe_nbr + 1;
 	if (alloc_cmd_struct_array(params) == -1)
 		return (handle_exit_failure(NULL, params));
@@ -59,11 +61,13 @@ int	main(int ac, char **av, char **env)
 	while (1)
 	{
 		check_line_read_eof(line_read, flag, &params);
-		cwd = strjoin_and_free_str(getcwd(NULL, 200), "$ ", 1);
+	//	cwd = strjoin_and_free_str(getcwd(NULL, 200), "$ ", 1);
+		cwd = find_env_var_value(head_env, "PWD");
+		cwd = strjoin_and_free_str(cwd, "$ ", 0);
 		line_read = readline(cwd);
+		free(cwd);
 		if (line_read && *line_read)
 			main_shell_loop(&params, line_read);
-		free(cwd);
 		flag = 1;
 	}
 }

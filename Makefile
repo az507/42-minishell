@@ -6,7 +6,7 @@
 #    By: achak <marvin@42.fr>                       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/31 14:40:12 by achak             #+#    #+#              #
-#    Updated: 2024/03/31 16:51:46 by marvin           ###   ########.fr        #
+#    Updated: 2024/04/03 15:57:25 by achak            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,7 @@ $(NAME):$(SRCS)
 	$(CC) $(SRCS) -o $(NAME) -lreadline
 
 test:
-	make re
-	clear && valgrind --leak-check=full ./$(NAME)
+	make re && clear && valgrind --leak-check=full ./$(NAME)
 
 clean:
 ifneq ("$(wildcard $(NAME))","")

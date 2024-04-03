@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 11:29:29 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 19:58:46 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/03 10:48:53 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,12 @@ void	free_cmd_arr(t_command *cmd_arr, int cmd_nbr)
 	i = -1;
 	while (++i < cmd_nbr)
 	{
+		if (cmd_arr[i].here_doc)
+		{
+			if (access(cmd_arr[i].here_doc, F_OK) == 0)
+				wrapper(unlink(cmd_arr[i].here_doc), "unlink");
+			free(cmd_arr[i].here_doc);
+		}
 		if (cmd_arr[i].cmd_args)
 			free(cmd_arr[i].cmd_args);
 		if (cmd_arr[i].cmd_path)
