@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 13:27:15 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 13:48:43 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/10 14:22:04 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,10 @@ int	check_for_char_in_str(char *str, char c)
 int	check_and_assign_cmd_path2(t_params *params, int i)
 {
 	char	*cwd;
+	//char	*cmd;
 
+	//cmd = strjoin_and_free_str(params->cmd_arr[i].cmd_args[0], "", 0);
+	//printf("cmd = %s\n", cmd);
 	cwd = strjoin_and_free_str(getcwd(NULL, 200), "/", 1);
 	cwd = strjoin_and_free_str(cwd, params->cmd_arr[i].cmd_args[0], 1);
 	if (access(cwd, F_OK | X_OK) == -1)
@@ -40,9 +43,12 @@ int	check_and_assign_cmd_path2(t_params *params, int i)
 //		ft_dprintf(STDERR_FILENO, "%s: %s\n",
 //			params->cmd_arr[i].cmd_args[0], strerror(errno));
 		perror(params->cmd_arr[i].cmd_args[0]);
+		//perror(cwd);
+		//free(cmd);
 		return (0);
 	}
 	free(cwd);
+	//free(cmd);
 	return (1);
 }
 
@@ -65,8 +71,9 @@ int	check_and_assign_cmd_path(t_params *params, int i, char **arr_path)
 			//printf("cmd_path = %s\n", cmd_path);
 			if (access(cmd_path, F_OK | X_OK) == 0)
 			{
-				free(params->cmd_arr[i].cmd_args[0]);
-				params->cmd_arr[i].cmd_args[0] = cmd_path;
+				//free(params->cmd_arr[i].cmd_args[0]);
+				//params->cmd_arr[i].cmd_args[0] = cmd_path;
+				params->cmd_arr[i].cmd_path = cmd_path;
 				free_array(arr_path);
 				return (1);
 			}

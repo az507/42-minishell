@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:40:40 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 12:59:33 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/10 12:21:00 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,21 @@ void	check_if_valid_var(char **temp, t_env *head_env, int *count, int *flag)
 
 	i = 0;
 	(*temp)++;
-	while (!is_whitespace((*temp)[i]) && (*temp)[i] != '|'
-		&& (*temp)[i] != '<' && (*temp)[i] != '>' && (*temp)[i]
-		&& (*temp)[i] != 39 && (*temp)[i] != '"' && (*temp)[i] != '$')
-		if ((*temp)[i++] == '?')
+//	while (!is_whitespace((*temp)[i]) && (*temp)[i] != '|'
+//		&& (*temp)[i] != '<' && (*temp)[i] != '>' && (*temp)[i]
+//		&& (*temp)[i] != 39 && (*temp)[i] != '"' && (*temp)[i] != '$')
+//		if ((*temp)[i++] == '?')
+//			break ;
+	while ((*temp)[i] && (is_alphabet((*temp)[i]) || is_numeric((*temp)[i])
+		|| (*temp)[i] == '_' || (*temp)[i] == '?'))
+	{
+		if (is_numeric((*temp)[i]) && i == 0)
 			break ;
+		else if ((*temp)[i] == '?' && i != 0)
+			break ;
+		i++;
+	}
+	//printf("i = %d\n", i);
 	while (head_env)
 	{
 		if (!my_strncmp(*temp, head_env->key, i))

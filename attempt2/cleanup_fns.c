@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 11:29:29 by achak             #+#    #+#             */
-/*   Updated: 2024/04/06 17:04:48 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/15 17:31:10 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ void	free_cmd_arr(t_command *cmd_arr, int cmd_nbr)
 		}
 		if (cmd_arr[i].cmd_args)
 			free_array(cmd_arr[i].cmd_args);
+		if (cmd_arr[i].cmd_path)
+			free(cmd_arr[i].cmd_path);
 		if (cmd_arr[i].raw_str)
 			free(cmd_arr[i].raw_str);
 //		if (cmd_arr[i].stdin_fds)
@@ -69,6 +71,8 @@ void	cleanup_params(t_params *params)
 {
 	if (params)
 	{
+		if (params->line_read)
+			free(params->line_read);
 		if (params->cmd_arr)
 			free_cmd_arr(params->cmd_arr, params->cmd_nbr);
 //		if (params->head_env)

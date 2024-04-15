@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 16:37:34 by achak             #+#    #+#             */
-/*   Updated: 2024/04/04 16:04:04 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/10 18:35:54 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ void	update_existing_entry(char *var, t_env **head_env)
 	int		i;
 	char	*value;
 
+	if (!head_env || !var)
+		return ;
 	update_node = *head_env;
 	i = 0;
 	while (var[i] && var[i] != '=')

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 14:38:48 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 17:54:07 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/15 17:25:47 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct s_command
 {
 	char	**cmd_args;
 	//char	**filenames;
+	char	*cmd_path;
 	char	*raw_str;
 	char	*heredoc;
 	int		stdin_fd;
@@ -51,51 +52,68 @@ typedef struct s_command
 
 typedef struct s_params
 {
+	char	*line_read;
 	t_command	*cmd_arr;
 	//int		heredoc_count;
 	int		cmd_nbr;
 	t_env	**head_env;
 }	t_params;
 
+static volatile sig_atomic_t	async = 0;
+//volatile sig_atomic_t	loop = 0;
+
 //	main.c
 int		count_len_til_pipe(char *temp);
 void	copy_line_til_pipe(t_params *params, int i, char **temp);
-void	split_raw_str_by_pipes(t_params *params, char *line_read);
+int		split_raw_str_by_pipes(t_params *params, char *line_read);
 void	main_shell_loop(t_params *params, char *line_read);
 
 //	misc_funcs_for_main.c
 void	signal_handler(int sig);
 void	set_up_signals(void);
-void	init_cmd_arr(t_command *cmd_arr, int cmd_nbr);
+void	init_cmd_arr(t_params *params, t_command *cmd_arr, int cmd_nbr,
+		char *line_read);
 void	init_params(t_params *params, t_env **head_env);
 void	check_read_line_eof(char *line_read, int flag, t_params *params);
 
 //	settle_child_process_stdin_and_out.c
 void	settle_child_process_stdin2(t_params *params, int i);
-void	settle_child_process_stdin(t_params *params, int i, int *old_fds);
-void	settle_child_process_stdout(t_params *params, int i, int *new_fds);
+void	settle_child_process_stdin(t_params *params, int i, int *new_fds,
+		int *old_fds);
+void	settle_child_process_stdout(t_params *params, int i, int *new_fds,
+		int *old_fds);
 
 //	child_process.c
-int		check_type_of_redirect(char *temp);
-int		count_valid_var(t_env *temp_env, int *word_len);
-void	count_var_len_redir(t_params *params, char **temp, int *word_len);
-int		count_word_len2(char *temp, int *word_len, int *k);
-int		count_word_len(t_params *params, char *temp);
+void	child_process2(t_params *params, int i, int *new_fds, int *old_fds);
+void	child_process(t_params *params, int i, int *new_fds, int *old_fds);
+
+//	copy_str_to_filename.c
 t_env	*is_valid_var(t_env *temp_env, char *temp, int j);
 int		copy_valid_var(t_env *temp_env, char *filename, int *k);
 void	copy_var_len_redir(t_params *params, char **temp, int *k, char *filename);
 int		copy_str_to_filename2(char *filename, char *temp, int *flag, int *k);
 void	copy_str_to_filename(t_params *params, char *filename, char *temp);
+
+//	expand_filename_and_count_word_len.c
+int		count_valid_var(t_env *temp_env, int *word_len);
+void	count_var_len_redir(t_params *params, char **temp, int *word_len);
+int		count_word_len2(char *temp, int *word_len, int *k);
+int		count_word_len(t_params *params, char *temp);
 char	*expand_filename(t_params *params, char *temp);
+
+//	open_redirects2.c
+int		check_type_of_redirect(char *temp);
 void	close_existing_fds(t_params *params, int i, int open_mode);
 int		open_call_error_or_not(t_params *params, int i, char *filename);
-int		open_new_files(t_params *params, int i, int open_mode, char *filename);
-void	erase_heredoc_and_delim(char **temp, int *flag);
+void	erase_redirs_from_str(char **temp, int *flag);
+
+//	open_redirects.c
 int		perror_filename(char *filename, int open_mode);
+int		open_new_files(t_params *params, int i, int open_mode,
+		char *filename);
 int		settle_redirects(t_params *params, int i, char **temp);
 void	skip_quoted_chars(char *temp, int *flag);
 int		open_redirects(t_params *params, int i);
-void	child_process(t_params *params, int i, int *new_fds, int *old_fds);
 
 //	cd_builtin2.c
 char	*find_env_var_value(t_env *head_env, char *var);
@@ -203,10 +221,13 @@ int		count_new_heredoc_len(char *str, t_params *params);
 int		check_quotes_in_heredoc_delim(char *line_read);
 int		count_delim_len(char *line_read);
 char	*alloc_delim_str(char *line_read, int delim_len);
+void	save_heredoc_to_struct(t_params *params, int i, int fd2, char *heredoc);
 void	ft_heredoc(t_params *params, int i, char *delim, int flag);
 int		is_heredoc_rightmost(char *line_read, int delim_len);
+void	erase_heredoc_and_delim(char **line_read, int *flag);
+void	erase_heredoc_and_delim(char **line_read, int *flag);
 void	check_for_heredoc(t_params *params, int i, char **line_read);
-void	open_all_heredocs(t_params *params, char *line_read);
+int		open_all_heredocs(t_params *params, char *line_read);
 
 //	create_symbol_table.c
 char	*copy_value_from_var(char *value, char *var, int i);

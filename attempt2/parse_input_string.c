@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:36:16 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 17:57:13 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/12 15:35:10 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ void	alloc_token_by_index(char **temp_line, char **token_arr, int i,
 
 	temp = *temp_line;
 	token_len = count_token_len(temp, head_env);
+	//printf("token_len = %d\n", token_len);
 	if (!token_arr)
 		return ;
 	token_arr[i] = (char *)malloc(sizeof(char) * (token_len + 1));
@@ -116,6 +117,8 @@ char	**parse_input_string(char *line_read, t_env *head_env)
 	char	**token_arr;
 
 	token_nbr = count_nbr_of_tokens(line_read, head_env);
+	if (!token_nbr)
+		return (NULL);
 	i = -1;
 	temp = line_read;
 	token_arr = (char **)malloc(sizeof(char *) * (token_nbr + 1));

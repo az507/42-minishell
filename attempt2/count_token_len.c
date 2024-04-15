@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 09:40:12 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 19:16:57 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/12 15:34:33 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,21 @@ void	count_var_len(char **temp, int *token_len, t_env *head_env)
 
 	j = 0;
 	(*temp)++;
-	while (!is_whitespace((*temp)[j]) && (*temp)[j] != '|'
-		&& (*temp)[j] != '<' && (*temp)[j] != '>' && (*temp)[j]
-		&& (*temp)[j] != 39 && (*temp)[j] != '"' && (*temp)[j] != '$')
-		if ((*temp)[j++] == '?')
+//	while (!is_whitespace((*temp)[j]) && (*temp)[j] != '|'
+//		&& (*temp)[j] != '<' && (*temp)[j] != '>' && (*temp)[j]
+//		&& (*temp)[j] != 39 && (*temp)[j] != '"' && (*temp)[j] != '$')
+//		if ((*temp)[j++] == '?')
+//			break ;
+	//printf("(*temp) = %s\n", *temp);
+	while ((*temp)[j] && (is_alphabet((*temp)[j]) || is_numeric((*temp)[j])
+		|| (*temp)[j] == '_' || (*temp)[j] == '?'))
+	{
+		//printf("(*temp)[%d] = %c\n", j, (*temp)[j]);
+		if ((is_numeric((*temp)[j]) && j == 0)
+			|| ((*temp)[j] == '?' && j != 0))
 			break ;
+		j++;
+	}
 	while (head_env)
 	{
 		if (!my_strncmp(*temp, head_env->key, j))

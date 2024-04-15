@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 12:55:20 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 13:42:43 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/15 17:21:21 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,7 @@ void	preparing_fork_and_execve(t_params *params, char *line_read)
 	char	*str;
 
 	i = -1;
+	wstatus = 0;
 	old_fds = NULL;
 	j = 0;
 	exit_str = NULL;
@@ -208,6 +209,8 @@ void	preparing_fork_and_execve(t_params *params, char *line_read)
 		while (j++ < (params->cmd_nbr - 1))
 			wait(NULL);
 		wait(&wstatus);
+//		while (waitpid(-1, &wstatus, WNOHANG) > 0)
+//			;
 		if (WIFEXITED(wstatus))
 		{
 			exit_str = strjoin_and_free_str("?=",

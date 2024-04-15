@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 16:23:54 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 17:56:18 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/15 17:06:28 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,18 @@ void	settle_child_process_stdin2(t_params *params, int i)
 	}
 }
 
-void	settle_child_process_stdin(t_params *params, int i, int *old_fd)
+void	settle_child_process_stdin(t_params *params, int i, int *new_fd, int *old_fd)
 {
+	if (!new_fd && !old_fd && i == 0)
+		return ;
 	if (i == 0)
+	{
+		//printf("--------------in settle child process stdin fd (1)--------\n");
 		settle_child_process_stdin2(params, i);
+	}
 	else if (old_fd)
 	{
+		//printf("--------------in settle child process stdin fd (2)--------\n");
 		wrapper(close(old_fd[1]), "close");
 		if ((params->cmd_arr[i].stdin_fd) != -2)
 		{
@@ -56,9 +62,9 @@ void	settle_child_process_stdin(t_params *params, int i, int *old_fd)
 	}
 }
 
-void	settle_child_process_stdout(t_params *params, int i, int *new_fd)
+void	settle_child_process_stdout(t_params *params, int i, int *new_fd, int *old_fd)
 {
-	if (!new_fd)
+	if (!new_fd && !old_fd && i == 0)
 		return ;
 	if (i == params->cmd_nbr - 1)
 	{

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 10:41:27 by achak             #+#    #+#             */
-/*   Updated: 2024/04/04 16:02:32 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/10 18:29:49 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,13 @@ int	cd_wrapper(t_env **head_env, char *new_path, char *path, char **dir_arr)
 
 	pwd = NULL;
 	flag = 0;
+	oldpwd = NULL;
 //	oldpwd = strjoin_and_free_str("OLDPWD=", getcwd(NULL, 200), 2);
-	oldpwd = find_env_var_value(*head_env, "PWD");
-	oldpwd = strjoin_and_free_str("OLDPWD=", oldpwd, 0);
+	if (head_env)
+	{
+		oldpwd = find_env_var_value(*head_env, "PWD");
+		oldpwd = strjoin_and_free_str("OLDPWD=", oldpwd, 0);
+	}
 	ch_path = path;
 	//printf("ch_path = %s\n", ch_path);
 	if (new_path)
@@ -89,18 +93,21 @@ int	cd_wrapper(t_env **head_env, char *new_path, char *path, char **dir_arr)
 		if (my_strlen(pwd) > 4)
 			if (pwd[my_strlen(pwd) - 1] == '\\')
 				pwd = remove_last_bytes_from_str(pwd, 1);
-		update_existing_entry(oldpwd, head_env);
-		//printf("pwd = %s\n", pwd);
-		update_existing_entry(pwd, head_env);
-		t_env	*temp;
-
-		temp = *head_env;
-		while (temp)
+		if (head_env)
 		{
-			if (!my_strncmp("PWD", temp->key, 3))
-				break ;
-			temp = temp->next;
+			update_existing_entry(oldpwd, head_env);
+			//printf("pwd = %s\n", pwd);
+			update_existing_entry(pwd, head_env);
 		}
+//		t_env	*temp;
+//
+//		temp = *head_env;
+//		while (temp)
+//		{
+//			if (!my_strncmp("PWD", temp->key, 3))
+//				break ;
+//			temp = temp->next;
+//		}
 		//printf("temp->value = %s\n", temp->value);
 	}
 	//return (free_cd_strings(dir_arr, flag));
@@ -153,7 +160,8 @@ int	cd_builtin(t_env **head_env, char **cmd_args)
 			write(STDERR_FILENO, "cd: too many arguments\n", 23);
 			return (1);
 		}
-		cdpath = find_env_var_value(*head_env, "CDPATH");
+		if (head_env)
+			cdpath = find_env_var_value(*head_env, "CDPATH");
 		if (!cdpath)
 		{
 			cdpath = getcwd(NULL, 200);

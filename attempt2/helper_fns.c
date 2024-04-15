@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 11:27:27 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 12:56:57 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/10 18:30:28 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ char	*strjoin_and_free_str(char *s1, char *s2, int str_nbr)
 
 	i = 0;
 	j = -1;
+	if (!s1 || !s2)
+		return (NULL);
 	str_len = my_strlen(s1) + my_strlen(s2);
 	str = (char *)malloc(sizeof(char) * (str_len + 1));
 	if (!str)

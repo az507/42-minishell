@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 16:46:40 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 17:12:33 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/15 17:12:36 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,23 @@ char	*alloc_delim_str(char *line_read, int delim_len)
 	return (delim);
 }
 
+void	save_heredoc_to_struct(t_params *params, int i, int fd2, char *heredoc)
+{
+	if (params->cmd_arr[i].stdin_fd != -2)
+	{
+		wrapper(close(params->cmd_arr[i].stdin_fd), "close");
+		params->cmd_arr[i].stdin_fd = -2;
+		wrapper(unlink(params->cmd_arr[i].heredoc), "unlink");
+		free(params->cmd_arr[i].heredoc);
+		params->cmd_arr[i].heredoc = NULL;
+	}
+	//printf("in save heredoc to struct fn (999)\n");
+	fd2 = open(heredoc, O_RDONLY);
+	params->cmd_arr[i].stdin_fd = fd2;
+	//printf("fd2 = %d\n", fd2);
+	params->cmd_arr[i].heredoc = heredoc;
+}
+
 void	ft_heredoc(t_params *params, int i, char *delim, int flag)
 {
 	static int	nbr = 0;
@@ -153,30 +170,51 @@ void	ft_heredoc(t_params *params, int i, char *delim, int flag)
 
 	heredoc = strjoin_and_free_str(".tmpheredoc", ft_itoa(nbr++), 2);
 	fd1 = open(heredoc, O_WRONLY | O_TRUNC | O_CREAT, 0600);
+	fd2 = -2;
 	while (1)
 	{
+		//printf("in heredoc loop: params->cmd_arr = %p\n", params->cmd_arr);
 		str = get_next_line(STDIN_FILENO);
 		//printf("delim = %s\n", delim);
 		if (!str)
-			break ;
-		if (my_strcmp(delim, str))
 		{
-			if (params->cmd_arr[i].stdin_fd != -2)
-			{
-				wrapper(close(params->cmd_arr[i].stdin_fd), "close");
-				params->cmd_arr[i].stdin_fd = -2;
-				wrapper(unlink(params->cmd_arr[i].heredoc), "unlink");
-				free(params->cmd_arr[i].heredoc);
-				params->cmd_arr[i].heredoc = NULL;
-			}
-			fd2 = open(heredoc, O_RDONLY);
-//			printf("fd1 in ft_heredoc loop = %d\n", fd1);
-//			printf("fd2 in ft_heredoc loop = %d\n", fd2);
-			params->cmd_arr[i].stdin_fd = fd2;
-			params->cmd_arr[i].heredoc = heredoc;
+			ft_dprintf(STDERR_FILENO, "warning: here_document delimited by end-of-file (wanted `%s')\n", delim);
+//			if (params->cmd_arr[i].stdin_fd != -2)
+//			{
+//				wrapper(close(params->cmd_arr[i].stdin_fd), "close");
+//				params->cmd_arr[i].stdin_fd = -2;
+//				wrapper(unlink(params->cmd_arr[i].heredoc), "unlink");
+//				free(params->cmd_arr[i].heredoc);
+//				params->cmd_arr[i].heredoc = NULL;
+//			}
+//			fd2 = open(heredoc, O_RDONLY);
+//			params->cmd_arr[i].stdin_fd = fd2;
+//			params->cmd_arr[i].heredoc = heredoc;
+			save_heredoc_to_struct(params, i, fd2, heredoc);
 			close(fd1);
 			free(delim);
+			break ;
+		}
+		if (my_strcmp(delim, str))
+		{
+			//printf("encountered delim: params->cmd_arr = %p\n", params->cmd_arr);
+//			if (params->cmd_arr[i].stdin_fd != -2)
+//			{
+//				wrapper(close(params->cmd_arr[i].stdin_fd), "close");
+//				params->cmd_arr[i].stdin_fd = -2;
+//				wrapper(unlink(params->cmd_arr[i].heredoc), "unlink");
+//				free(params->cmd_arr[i].heredoc);
+//				params->cmd_arr[i].heredoc = NULL;
+//			}
+//			fd2 = open(heredoc, O_RDONLY);
+////			printf("fd1 in ft_heredoc loop = %d\n", fd1);
+////			printf("fd2 in ft_heredoc loop = %d\n", fd2);
+//			params->cmd_arr[i].stdin_fd = fd2;
+	//		params->cmd_arr[i].heredoc = heredoc;
+			save_heredoc_to_struct(params, i, fd2, heredoc);
+			close(fd1);
 			free(str);
+			free(delim);
 			return ;
 		}
 		if (!flag)
@@ -214,9 +252,51 @@ int	is_heredoc_rightmost(char *line_read, int delim_len)
 			return (0);
 		else if (*line_read == '|')
 			return (1);
+		//printf("fd2 = %d\n", fd2);
 		line_read++;
 	}
 	return (1);
+}
+
+void	erase_heredoc_and_delim(char **line_read, int *flag)
+{
+	//printf("in erase heredoc fn (1)\n");
+	while (**line_read && (**line_read == '<' || is_whitespace(**line_read)))
+	{
+		//printf("in erase heredoc fn (4)\n");
+		**line_read = ' ';
+		(*line_read)++;
+//		*(*line_read)++ = ' ';
+
+	}
+//	while (**line_read && is_whitespace(**line_read))
+//		(*line_read)++;
+	while (**line_read)
+	{
+		if ((*flag == 1 && **line_read == 39)
+			|| (*flag == 2 && **line_read == '"'))
+		{
+			*flag = 0;
+			**line_read = ' ';
+		}
+		else if (*flag == 1 || *flag == 2)
+			**line_read = ' ';
+		else if (**line_read == 39)
+		{
+			*flag = 1;
+			**line_read = ' ';
+		}
+		else if (**line_read == '"')
+		{
+			*flag = 2;
+			**line_read = ' ';
+		}
+		else if (!is_whitespace(**line_read))
+			**line_read = ' ';
+		else if (is_whitespace(**line_read))
+			break ;
+		(*line_read)++;
+	}
 }
 
 void	check_for_heredoc(t_params *params, int i, char **line_read)
@@ -239,16 +319,6 @@ void	check_for_heredoc(t_params *params, int i, char **line_read)
 		if (delim)
 			ft_heredoc(params, i, delim, flag);
 		flag = 0;
-		while (**line_read == '<')
-		{
-			**line_read = ' ';
-			(*line_read)++;
-		}
-		while (**line_read && is_whitespace(**line_read))
-		{
-		//	printf("------>>>(3) In here\n");
-			(*line_read)++;
-		}
 //		if (**line_read == 39 || **line_read == '"')
 //		{
 //			printf("----->>>(1) In here\n");
@@ -264,32 +334,9 @@ void	check_for_heredoc(t_params *params, int i, char **line_read)
 //			(*line_read)++;
 //		}
 		//while (**line_read && j < delim_len)
-		while (**line_read)
-		{
-			if ((flag == 1 && **line_read == 39)
-				|| (flag == 2 && **line_read == '"'))
-			{
-				flag = 0;
-				**line_read = ' ';
-			}
-			else if (flag == 1 || flag == 2)
-				**line_read = ' ';
-			else if (**line_read == 39)
-			{
-				flag = 1;
-				**line_read = ' ';
-			}
-			else if (**line_read == '"')
-			{
-				flag = 2;
-				**line_read = ' ';
-			}
-			else if (!is_whitespace(**line_read))
-				**line_read = ' ';
-			else if (is_whitespace(**line_read))
-				break ;
-			(*line_read)++;
-		}
+		// the real erase_heredoc_and_delim .c
+		erase_heredoc_and_delim(line_read, &flag);
+		//ERASE_HEREDOC_AND_DELIM();
 		//printf("*line_read after erasing away chars: %s\n", *line_read);
 //		if (!is_whitespace(**line_read))
 //		if (**line_read)
@@ -307,7 +354,7 @@ void	check_for_heredoc(t_params *params, int i, char **line_read)
 		(*line_read)++;
 }
 
-void	open_all_heredocs(t_params *params, char *line_read)
+int	open_all_heredocs(t_params *params, char *line_read)
 {
 	int	i;
 	int	flag;
@@ -316,6 +363,22 @@ void	open_all_heredocs(t_params *params, char *line_read)
 	flag = 0;
 	while (*line_read)
 	{
+		// if global var async == 1
+		// close all open fds, prepare to cleanup
+		// to move to next iteration of readline while loop
+//		if (async == 1)
+//		{
+//			i = -1;
+//			while (++i < params->cmd_nbr)
+//			{
+//				if (params->cmd_arr[i].stdin_fd != -2)
+//					close(params->cmd_arr[i].stdin_fd);
+//			}
+//			cleanup_params(params);
+//			async = 0;
+//			return (-1);
+//		}
+		// ASYNC SIGINT
 		if ((flag == 1 && *line_read == 39)
 			|| (flag == 2 && *line_read == '"'))
 			flag = 0;
@@ -340,4 +403,5 @@ void	open_all_heredocs(t_params *params, char *line_read)
 			i++;
 		line_read++;
 	}
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 16:04:50 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 17:36:05 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/10 13:27:23 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,19 @@ int	check_after_meta_char(char **line_read)
 {
 	if (*(*line_read + 1))
 	{
-		if (*(*line_read + 1) == '<' || *(*line_read + 1) == '>')
+		if (**line_read == '<' && *(*line_read + 1) == '<')
+		{
+			(*line_read) += 2;
+			while (**line_read && is_whitespace(**line_read))
+				(*line_read)++;
+			if (!**line_read)
+				return (-1);
+			else if (**line_read == '<' || **line_read == '>'
+				|| **line_read == '|')
+				return (-1);
+			return (0);
+		}
+		else if (*(*line_read + 1) == '<' || *(*line_read + 1) == '>')
 		{
 			if (**line_read != *(*line_read + 1))
 				return (-1);
@@ -122,8 +134,8 @@ int	nbr_of_pipes(char *line_read)
 		}
 		line_read++;
 	}
-	if (flag == 1 || flag == 2)
-		ft_dprintf(STDERR_FILENO, "syntax error near quotes\n");
+//	if (flag == 1 || flag == 2)
+//		ft_dprintf(STDERR_FILENO, "syntax error near quotes\n");
 	return (nbr);
 }
 
