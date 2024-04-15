@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 19:48:11 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 17:19:18 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/05 13:23:47 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,3 +79,38 @@ int	move_ptr_past_var(char **temp, t_env **head_env)
 //	}
 	return (j);
 }
+
+/*
+void	copy_var_len(char **temp, char *token_arr, int *i, t_env *head_env)
+{
+	int	j;
+	int	k;
+
+	k = 0;
+	(*temp)++;
+	j = move_ptr_past_var(temp, &head_env);
+//	if (j == -1)
+//		return ;
+	if ((*temp)[0] && j != 0)
+	{
+		if (!head_env)
+		{
+			(*temp) += j;
+			return ;
+		}
+		if (!(((*temp)[0] >= 'a' && (*temp)[0] <= 'z')
+			|| ((*temp)[0] >= 'A' && (*temp)[0] <= 'Z'))
+			&& ((*temp)[0] != '_') && ((*temp)[0] != '?'))
+		{
+			token_arr[++(*i)] = '$'; 
+			(*temp) += j;
+			return ;
+		}
+		while (k < my_strlen(head_env->value))
+			token_arr[++(*i)] = head_env->value[k++];
+	}
+	else
+		token_arr[++(*i)] = '$';
+	(*temp) += j;
+}
+*/

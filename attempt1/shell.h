@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 19:25:15 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 18:46:03 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/05 12:33:46 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ typedef struct s_params
 */
 typedef struct s_command
 {
+	// char **filenames for child process to open themselves
+	// int	heredoc_right_most;
 	char	*here_doc;
 	char	*cmd_path;
 	char	**cmd_args;
@@ -68,6 +70,7 @@ typedef struct s_command
 
 typedef struct s_params
 {
+	// int	here_doc_count;
 	t_env		**head_env;
 	t_command	*cmd_arr;
 	int			cmd_nbr;

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 14:00:05 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 17:56:21 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/04 16:01:50 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,9 @@ int	main(int ac, char **av, char **env)
 	while (1)
 	{
 		check_line_read_eof(line_read, flag, &params);
-	//	cwd = strjoin_and_free_str(getcwd(NULL, 200), "$ ", 1);
-		cwd = find_env_var_value(head_env, "PWD");
-		cwd = strjoin_and_free_str(cwd, "$ ", 0);
+		cwd = strjoin_and_free_str(getcwd(NULL, 200), "$ ", 1);
+//		cwd = find_env_var_value(head_env, "PWD");
+//		cwd = strjoin_and_free_str(cwd, "$ ", 0);
 		line_read = readline(cwd);
 		free(cwd);
 		if (line_read && *line_read)

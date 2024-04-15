@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 16:37:34 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 17:46:03 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/04 16:04:04 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,16 @@ void	update_existing_entry(char *var, t_env **head_env)
 			break ;
 		update_node = update_node->next;
 	}
+	//printf("var in update fn = %s\n", var);
 	value = get_value_from_var(var);
 	if (!value || !update_node)
 		return ;
 	if (update_node->value)
+	{
+		//printf("update_node->value = %s\n", update_node->value);
 		free(update_node->value);
+	}
+	//printf("value = %s\n", value);
 	update_node->value = value;
 }
 

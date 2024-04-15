@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 10:41:27 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 18:52:21 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/04 16:02:32 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,10 @@ int	cd_wrapper(t_env **head_env, char *new_path, char *path, char **dir_arr)
 	oldpwd = find_env_var_value(*head_env, "PWD");
 	oldpwd = strjoin_and_free_str("OLDPWD=", oldpwd, 0);
 	ch_path = path;
-	printf("ch_path = %s\n", ch_path);
+	//printf("ch_path = %s\n", ch_path);
 	if (new_path)
 		ch_path = new_path;
-	printf("new_path = %s\n", new_path);
+	//printf("new_path = %s\n", new_path);
 	if (chdir(ch_path) == -1)
 	{
 		flag = 1;
@@ -84,12 +84,24 @@ int	cd_wrapper(t_env **head_env, char *new_path, char *path, char **dir_arr)
 		{
 			free(pwd);
 			pwd = getcwd(NULL, 200);
+			pwd = strjoin_and_free_str("PWD=", pwd, 2);
 		}
 		if (my_strlen(pwd) > 4)
 			if (pwd[my_strlen(pwd) - 1] == '\\')
 				pwd = remove_last_bytes_from_str(pwd, 1);
 		update_existing_entry(oldpwd, head_env);
+		//printf("pwd = %s\n", pwd);
 		update_existing_entry(pwd, head_env);
+		t_env	*temp;
+
+		temp = *head_env;
+		while (temp)
+		{
+			if (!my_strncmp("PWD", temp->key, 3))
+				break ;
+			temp = temp->next;
+		}
+		//printf("temp->value = %s\n", temp->value);
 	}
 	//return (free_cd_strings(dir_arr, flag));
 	return (free_cd_strings(oldpwd, pwd, dir_arr, flag));
@@ -143,7 +155,10 @@ int	cd_builtin(t_env **head_env, char **cmd_args)
 		}
 		cdpath = find_env_var_value(*head_env, "CDPATH");
 		if (!cdpath)
+		{
 			cdpath = getcwd(NULL, 200);
+			//printf("cdpath = %s\n", cdpath);
+		}
 		else
 			dir_arr = ft_split(cdpath, ':');
 		return (different_cd_criteria(head_env, cmd_args, cdpath, dir_arr));
