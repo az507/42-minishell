@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:40:05 by achak             #+#    #+#             */
-/*   Updated: 2024/04/06 17:06:11 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/16 12:59:47 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,11 @@ int	env_builtin(t_env *head_env)
 {
 	while (head_env)
 	{
+		if (!my_strncmp("?", head_env->key, 1))
+		{
+			head_env = head_env->next;
+			continue ;
+		}
 		if (head_env->value)
 			printf("%s=%s\n", head_env->key, head_env->value);
 		head_env = head_env->next;

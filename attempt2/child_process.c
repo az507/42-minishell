@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 13:19:57 by achak             #+#    #+#             */
-/*   Updated: 2024/04/15 17:13:49 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/16 12:33:34 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 void	child_process2(t_params *params, int i, int *new_fds, int *old_fds)
 {
+	char	**envp;
+
+	envp = create_envp_arr(*(params->head_env));
 	if (locate_command_names(params, i) == -1)
 	{
 		cleanup_params(params);
@@ -28,26 +31,40 @@ void	child_process2(t_params *params, int i, int *new_fds, int *old_fds)
 	settle_child_process_stdout(params, i, new_fds, old_fds);
 	if (!new_fds && !old_fds)
 	{
+		free_array(envp);
 		//printf("in here\n");
 		execute_builtin(params, i, 0, NULL);
 	}
 	else if (check_if_cmd_is_builtin(params->cmd_arr[i].cmd_args[0]))
+	{
+		free_array(envp);
 		execute_builtin(params, i, 1, old_fds);
+	}
 	else if (params->cmd_arr[i].cmd_path)
 	{
+		//envp = create_envp_arr(*(params->head_env));
+//		int	j = -1;
+//		while (envp[++j])
+//			printf("envp[%d] = %s\n", j, envp[j]);
 		execve(params->cmd_arr[i].cmd_path,
-			params->cmd_arr[i].cmd_args, NULL);
+			params->cmd_arr[i].cmd_args, envp);
 		perror(params->cmd_arr[i].cmd_args[0]);
 		cleanup_params(params);
+		free_array(envp);
 		free(old_fds);
 		exit(EXIT_FAILURE);
 	}
 	else
 	{
+		//envp = create_envp_arr(*(params->head_env));
+//		int	j = -1;
+//		while (envp[++j])
+//			printf("envp[%d] = %s\n", j, envp[j]);
 		execve(params->cmd_arr[i].cmd_args[0],
-			params->cmd_arr[i].cmd_args, NULL);
+			params->cmd_arr[i].cmd_args, envp);
 		perror(params->cmd_arr[i].cmd_args[0]);
 		cleanup_params(params);
+		free_array(envp);
 		free(old_fds);
 		exit(EXIT_FAILURE);
 	}

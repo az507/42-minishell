@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 16:37:34 by achak             #+#    #+#             */
-/*   Updated: 2024/04/10 18:35:54 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/16 13:01:38 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,11 @@ int	export_builtin(t_env **head_env, char **cmd_args)
 		temp = *head_env;
 		while (temp)
 		{
+			if (!my_strncmp("?", temp->key, 1))
+			{
+				temp = temp->next;
+				continue ;
+			}
 			printf("declare -x %s", temp->key);
 			if (temp->value)
 				printf("=\"%s\"\n", temp->value);

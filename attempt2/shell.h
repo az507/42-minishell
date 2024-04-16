@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 14:38:48 by achak             #+#    #+#             */
-/*   Updated: 2024/04/15 17:25:47 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/16 12:13:32 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,6 +240,11 @@ void	remove_head_ptr_or_not(t_env **head, t_env *remove_node,
 			t_env *prev_node, t_env *next_node);
 void	remove_table_entry(t_env **head, char *key);
 char	*get_key_from_var(char *var);
+
+//	create_envp_arr.c
+int		count_env_nbr(t_env *head_env);
+int		copy_strs_to_envp_arr(int i, char **envp, t_env *temp);
+char	**create_envp_arr(t_env *head_env);
 
 //	helper_fns2.c
 void	ft_memset(void *s, int c, size_t n);
