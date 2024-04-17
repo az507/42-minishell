@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 19:48:11 by achak             #+#    #+#             */
-/*   Updated: 2024/04/08 10:18:06 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 18:57:27 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,38 +55,6 @@ int	copy_quote_len(char **temp, int *i, char *token_arr, t_env *head_env)
 	if (**temp == quote)
 		(*temp)++;
 	return (1);
-}
-
-int	move_ptr_past_var(char **temp, t_env **head_env)
-{
-	int	j;
-
-	j = 0;
-//	while (!is_whitespace((*temp)[j]) && (*temp)[j] != '|' && (*temp)[j]
-//		&& (*temp)[j] != '<' && (*temp)[j] != '>' && (*temp)[j] != 39
-//		&& (*temp)[j] != '"' && (*temp)[j] != '$')
-//		j++;
-	while ((*temp)[j] && (is_alphabet((*temp)[j]) || is_numeric((*temp)[j])
-			|| (*temp)[j] == '_' || (*temp)[j] == '?'))
-	{
-		if (is_numeric((*temp)[j]) && j == 0)
-			break ;
-		if ((*temp)[j] == '?' && j != 0)
-			break ;
-		j++;
-	}
-	while (*head_env)
-	{
-		if (!my_strncmp(*temp, (*head_env)->key, j))
-			break ;
-		*head_env = (*head_env)->next;
-	}
-//	if (!*head_env)
-//	{
-//		(*temp) += j;
-//		return (-1);
-//	}
-	return (j);
 }
 
 /*

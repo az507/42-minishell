@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 13:27:15 by achak             #+#    #+#             */
-/*   Updated: 2024/04/10 14:22:04 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 21:32:01 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,24 +31,16 @@ int	check_for_char_in_str(char *str, char c)
 int	check_and_assign_cmd_path2(t_params *params, int i)
 {
 	char	*cwd;
-	//char	*cmd;
 
-	//cmd = strjoin_and_free_str(params->cmd_arr[i].cmd_args[0], "", 0);
-	//printf("cmd = %s\n", cmd);
 	cwd = strjoin_and_free_str(getcwd(NULL, 200), "/", 1);
 	cwd = strjoin_and_free_str(cwd, params->cmd_arr[i].cmd_args[0], 1);
 	if (access(cwd, F_OK | X_OK) == -1)
 	{
 		free(cwd);
-//		ft_dprintf(STDERR_FILENO, "%s: %s\n",
-//			params->cmd_arr[i].cmd_args[0], strerror(errno));
 		perror(params->cmd_arr[i].cmd_args[0]);
-		//perror(cwd);
-		//free(cmd);
 		return (0);
 	}
 	free(cwd);
-	//free(cmd);
 	return (1);
 }
 
@@ -63,16 +55,11 @@ int	check_and_assign_cmd_path(t_params *params, int i, char **arr_path)
 	{
 		while (arr_path[++j])
 		{
-			//arr_path[j] = strjoin_and_free_str(arr_path[j], "/", 1);
 			cmd_path = strjoin_and_free_str(arr_path[j], "/", 0);
-			//cmd_path = strjoin_and_free_str(arr_path[j], cmd_path, 2);
 			cmd_path = strjoin_and_free_str(cmd_path,
-				params->cmd_arr[i].cmd_args[0], 1);
-			//printf("cmd_path = %s\n", cmd_path);
+					params->cmd_arr[i].cmd_args[0], 1);
 			if (access(cmd_path, F_OK | X_OK) == 0)
 			{
-				//free(params->cmd_arr[i].cmd_args[0]);
-				//params->cmd_arr[i].cmd_args[0] = cmd_path;
 				params->cmd_arr[i].cmd_path = cmd_path;
 				free_array(arr_path);
 				return (1);
@@ -110,16 +97,11 @@ int	locate_command_names(t_params *params, int i)
 	}
 	else
 	{
-//		ft_dprintf(STDERR_FILENO, "%s: command not found\n",
-//			params->cmd_arr[i].cmd_args[0]);
 		if (access(params->cmd_arr[i].cmd_args[0], F_OK | X_OK) == -1)
 			perror(params->cmd_arr[i].cmd_args[0]);
 		return (-1);
 	}
 	if (!check_and_assign_cmd_path(params, i, arr_path))
 		return (-1);
-//	if (!check_and_assign_cmd_path(params,
-//			params->cmd_arr[i].cmd_args[0], i))
-//		return (-1);
 	return (0);
 }

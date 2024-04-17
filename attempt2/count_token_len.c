@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 09:40:12 by achak             #+#    #+#             */
-/*   Updated: 2024/04/12 15:34:33 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 19:29:35 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,9 @@ void	count_var_len2(char **temp, int *token_len, t_env *head_env, int j)
 			&& ((*temp)[0] != '_') && ((*temp)[0] != '?')))
 		{
 			(*temp) += j;
+//			if (flag == 0 && *token_len == 0)
+//				while (**temp && is_whitespace(**temp))
+//					(*temp)++;
 			return ;
 		}
 		(*token_len) += my_strlen(head_env->value);
@@ -30,22 +33,15 @@ void	count_var_len2(char **temp, int *token_len, t_env *head_env, int j)
 	(*temp) += j;
 }
 
-void	count_var_len(char **temp, int *token_len, t_env *head_env)
+void	count_var_len(char **temp, int *token_len, t_env *head_env, int flag)
 {
 	int	j;
 
 	j = 0;
 	(*temp)++;
-//	while (!is_whitespace((*temp)[j]) && (*temp)[j] != '|'
-//		&& (*temp)[j] != '<' && (*temp)[j] != '>' && (*temp)[j]
-//		&& (*temp)[j] != 39 && (*temp)[j] != '"' && (*temp)[j] != '$')
-//		if ((*temp)[j++] == '?')
-//			break ;
-	//printf("(*temp) = %s\n", *temp);
 	while ((*temp)[j] && (is_alphabet((*temp)[j]) || is_numeric((*temp)[j])
 		|| (*temp)[j] == '_' || (*temp)[j] == '?'))
 	{
-		//printf("(*temp)[%d] = %c\n", j, (*temp)[j]);
 		if ((is_numeric((*temp)[j]) && j == 0)
 			|| ((*temp)[j] == '?' && j != 0))
 			break ;
@@ -56,6 +52,22 @@ void	count_var_len(char **temp, int *token_len, t_env *head_env)
 		if (!my_strncmp(*temp, head_env->key, j))
 			break ;
 		head_env = head_env->next;
+	}
+	if (!head_env && flag == 0 && *token_len == 0)
+	{
+		//printf("?????????????????????????????????????????????\n");
+		//printf("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
+		*temp += j;
+		//printf("99999999999999    *temp =%s\n", *temp);
+		if (**temp && is_whitespace(**temp))
+		{
+			while (**temp && is_whitespace(**temp))
+			{
+				(*temp)++;
+				//printf("88888888888    *temp =%s\n", *temp);
+			}
+		}
+		return ;
 	}
 	count_var_len2(temp, token_len, head_env, j);
 }

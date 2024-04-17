@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 16:37:34 by achak             #+#    #+#             */
-/*   Updated: 2024/04/16 13:01:38 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 17:43:29 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,16 +52,11 @@ void	update_existing_entry(char *var, t_env **head_env)
 			break ;
 		update_node = update_node->next;
 	}
-	//printf("var in update fn = %s\n", var);
 	value = get_value_from_var(var);
 	if (!value || !update_node)
 		return ;
 	if (update_node->value)
-	{
-		//printf("update_node->value = %s\n", update_node->value);
 		free(update_node->value);
-	}
-	//printf("value = %s\n", value);
 	update_node->value = value;
 }
 
@@ -109,38 +104,37 @@ int	export_var_into_env_list(t_env **head_env, char **cmd_args)
 	}
 	return (flag);
 }
+/*
+			if (!my_strncmp("?", temp->key, 1))
+			{
+				temp = temp->next;
+				continue ;
+			}
+*/
 
 int	export_builtin(t_env **head_env, char **cmd_args)
 {
-	int		i;
-	int		j;
 	int		flag;
 	t_env	*temp;
 
-	i = 0;
-	j = 1;
 	flag = 0;
 	if (!cmd_args[1])
 	{
 		temp = *head_env;
 		while (temp)
 		{
-			if (!my_strncmp("?", temp->key, 1))
+			if (my_strncmp("?", temp->key, 1))
 			{
-				temp = temp->next;
-				continue ;
-			}
-			printf("declare -x %s", temp->key);
-			if (temp->value)
-				printf("=\"%s\"\n", temp->value);
-			else
+				printf("declare -x %s", temp->key);
+				if (temp->value)
+					printf("=\"%s\"", temp->value);
 				printf("\n");
+			}
 			temp = temp->next;
 		}
 	}
-	else
-		if (!export_var_into_env_list(head_env, cmd_args))
-			return (2);
+	else if (!export_var_into_env_list(head_env, cmd_args))
+		return (2);
 	return (0);
 }
 

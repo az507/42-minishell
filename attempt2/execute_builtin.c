@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 13:33:43 by achak             #+#    #+#             */
-/*   Updated: 2024/04/15 16:58:06 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 17:32:56 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,7 @@
 void	choose_which_builtin_to_exec(t_params *params, int i, int *exit_status)
 {
 	if (!my_strncmp("echo", params->cmd_arr[i].cmd_args[0], 4))
-	{
-		//printf("echo builtin called ;;\n");
 		*exit_status = echo_builtin(params->cmd_arr[i].cmd_args);
-	}
 	else if (!my_strncmp("pwd", params->cmd_arr[i].cmd_args[0], 3))
 		*exit_status = pwd_builtin(*(params->head_env));
 	else if (!my_strncmp("cd", params->cmd_arr[i].cmd_args[0], 2))
@@ -33,10 +30,7 @@ void	choose_which_builtin_to_exec(t_params *params, int i, int *exit_status)
 	else if (!my_strncmp("env", params->cmd_arr[i].cmd_args[0], 3))
 		*exit_status = env_builtin(*(params->head_env));
 	else if (!my_strncmp("exit", params->cmd_arr[i].cmd_args[0], 4))
-	{
-		//printf("exit builtin called\n");
 		exit_builtin(params, params->cmd_arr[i].cmd_args);
-	}
 }
 
 void	preserve_stdin_and_stdout(t_params *params, int i, int *dup_stdin,
@@ -50,15 +44,10 @@ void	preserve_stdin_and_stdout(t_params *params, int i, int *dup_stdin,
 		wrapper(dup2((params->cmd_arr[i].stdin_fd), STDIN_FILENO), "dup2");
 		wrapper(close((params->cmd_arr[i].stdin_fd)), "close");
 		if (params->cmd_arr[i].heredoc)
-		{
-		//	ft_dprintf(2, "in here----->>>>\n");
 			wrapper(unlink(params->cmd_arr[i].heredoc), "unlink");
-		}
-		//ft_dprintf(2, "a: in here----->>>>\n");
 	}
 	if ((params->cmd_arr[i].stdout_fd) != -2)
 	{
-		//ft_dprintf(2, "b: in here----->>>>\n");
 		*dup_stdout = dup(STDOUT_FILENO);
 		if (*dup_stdout == -1)
 			perror("dup stdout");
@@ -69,7 +58,6 @@ void	preserve_stdin_and_stdout(t_params *params, int i, int *dup_stdin,
 
 void	restore_stdin_and_stdout(int dup_stdin, int dup_stdout)
 {
-	//printf("dup_stdin = %d, dup_stdout = %d\n", dup_stdin, dup_stdout);
 	if (dup_stdin != -2)
 	{
 		wrapper(dup2(dup_stdin, STDIN_FILENO), "dup2");
@@ -91,20 +79,14 @@ int	execute_builtin(t_params *params, int i, int flag, int *old_fd)
 	exit_status = 0;
 	dup_stdin = -2;
 	dup_stdout = -2;
-//	printf("params->cmd_arr[%d].stdin_fd = %d\n", i, params->cmd_arr[i].stdin_fd);
-//	printf("params->cmd_arr[%d].stdout_fd = %d\n", i, params->cmd_arr[i].stdout_fd);
 	if (!flag)
 		preserve_stdin_and_stdout(params, i, &dup_stdin, &dup_stdout);
-	//printf("EXITING HERE (A2)\n");
 	choose_which_builtin_to_exec(params, i, &exit_status);
-	//printf("EXITING HERE (A3)\n");
 	cleanup_params(params);
-	//printf("EXITING HERE (A4)\n");
 	if (flag)
 	{
 		free_symbol_table(params->head_env);
 		free(old_fd);
-		//printf("EXITING HERE (A1)\n");
 		exit(exit_status);
 	}
 	else

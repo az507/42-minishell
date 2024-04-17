@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 13:40:53 by achak             #+#    #+#             */
-/*   Updated: 2024/04/15 15:49:04 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 20:31:07 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,22 +30,27 @@ int	check_type_of_redirect(char *temp)
 
 void	close_existing_fds(t_params *params, int i, int open_mode)
 {
+//	printf("params->cmd_arr[%d].stdin_fd = %d\n", i, params->cmd_arr[i].stdin_fd);
+//	printf("params->cmd_arr[%d].heredoc_rightmost = %d\n", i,
+//		params->cmd_arr[i].heredoc_rightmost);
+	//printf("params->cmd_arr[%d].stdout_fd = %d\n", i, params->cmd_arr[i].stdout_fd);
 	if ((open_mode == 1 || open_mode == 2)
 		&& params->cmd_arr[i].stdout_fd != -2)
-		close(params->cmd_arr[i].stdout_fd);
-	else if (open_mode == 3 && params->cmd_arr[i].heredoc_rightmost == 0)
+		wrapper(close(params->cmd_arr[i].stdout_fd), "close");
+	else if (open_mode == 3 && params->cmd_arr[i].heredoc_rightmost == 0
+			&& params->cmd_arr[i].stdin_fd != -2)
 	{
-		close(params->cmd_arr[i].stdin_fd);
+		wrapper(close(params->cmd_arr[i].stdin_fd), "close");
 		if (params->cmd_arr[i].heredoc)
 		{
-			unlink(params->cmd_arr[i].heredoc);
+			wrapper(unlink(params->cmd_arr[i].heredoc), "unlink");
 			free(params->cmd_arr[i].heredoc);
 			params->cmd_arr[i].heredoc = NULL;
 		}
 	}
 	else if (open_mode == 3 && params->cmd_arr[i].heredoc_rightmost == -1
 		&& params->cmd_arr[i].stdin_fd != -2)
-		close(params->cmd_arr[i].stdin_fd);
+		wrapper(close(params->cmd_arr[i].stdin_fd), "close");
 }
 
 int	open_call_error_or_not(t_params *params, int i, char *filename)

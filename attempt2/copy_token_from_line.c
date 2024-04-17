@@ -6,11 +6,46 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 12:04:37 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 17:27:37 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 21:40:23 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
+
+int	move_ptr_past_var(char **temp, t_env **head_env)
+{
+	int	j;
+
+	j = 0;
+	while ((*temp)[j] && (is_alphabet((*temp)[j]) || is_numeric((*temp)[j])
+			|| (*temp)[j] == '_' || (*temp)[j] == '?'))
+	{
+		if ((is_numeric((*temp)[j]) && j == 0)
+			|| ((*temp)[j] == '?' && j != 0))
+			break ;
+		j++;
+	}
+	while (*head_env)
+	{
+		if (!my_strncmp(*temp, (*head_env)->key, j))
+			break ;
+		*head_env = (*head_env)->next;
+	}
+	return (j);
+}
+
+int	dont_copy_if_invalid_var(char **temp, t_env *head_env)
+{
+	if (!head_env)
+	{
+		(*temp) += j;
+		if (*i == -1 && **temp && is_whitespace(**temp))
+			while (**temp && is_whitespace(**temp))
+				(*temp)++;
+		return (1);
+	}
+	return (0);
+}
 
 // Need to account for var len for '$?' ?
 void	copy_var_len(char **temp, char *token_arr, int *i, t_env *head_env)
@@ -21,20 +56,15 @@ void	copy_var_len(char **temp, char *token_arr, int *i, t_env *head_env)
 	k = 0;
 	(*temp)++;
 	j = move_ptr_past_var(temp, &head_env);
-//	if (j == -1)
-//		return ;
+	if (dont_copy_if_invalid_var(temp, &head_env) == 1)
+		return ;
 	if ((*temp)[0] && j != 0)
 	{
-		if (!head_env)
-		{
-			(*temp) += j;
-			return ;
-		}
 		if (!(((*temp)[0] >= 'a' && (*temp)[0] <= 'z')
 			|| ((*temp)[0] >= 'A' && (*temp)[0] <= 'Z'))
 			&& ((*temp)[0] != '_') && ((*temp)[0] != '?'))
 		{
-			token_arr[++(*i)] = '$'; 
+			token_arr[++(*i)] = '$';
 			(*temp) += j;
 			return ;
 		}
@@ -57,13 +87,11 @@ void	copy_regular_len(char **temp, char *token_arr, int *i)
 	}
 }
 
-int	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
+void	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
 {
 	int	i;
-	int	flag;
 
 	i = -1;
-	flag = 0;
 	while (is_whitespace(**temp))
 		(*temp)++;
 	if (**temp == '|' || **temp == '<' || **temp == '>')
@@ -74,7 +102,7 @@ int	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
 			&& **temp && !is_whitespace(**temp))
 		{
 			if (**temp == 39 || **temp == '"')
-				flag = copy_quote_len(temp, &i,
+				copy_quote_len(temp, &i,
 					token_arr, head_env);
 			else if (**temp == '$')
 				copy_var_len(temp, token_arr,
@@ -83,5 +111,4 @@ int	copy_token_from_line(char **temp, char *token_arr, t_env *head_env)
 				copy_regular_len(temp, token_arr, &i);
 		}
 	}
-	return (flag);
 }

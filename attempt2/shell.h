@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 14:38:48 by achak             #+#    #+#             */
-/*   Updated: 2024/04/16 12:13:32 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 21:40:49 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,12 @@ void	check_read_line_eof(char *line_read, int flag, t_params *params);
 
 //	settle_child_process_stdin_and_out.c
 void	settle_child_process_stdin2(t_params *params, int i);
-void	settle_child_process_stdin(t_params *params, int i, int *new_fds,
-		int *old_fds);
-void	settle_child_process_stdout(t_params *params, int i, int *new_fds,
-		int *old_fds);
+void	settle_child_process_stdin3(t_params *params, int i, int *old_fd);
+void	settle_child_process_stdin(t_params *params, int i, int *new_fd,
+		int *old_fd);
+void	settle_child_process_stdout2(t_params *params, int i, int *new_fd);
+void	settle_child_process_stdout(t_params *params, int i, int *new_fd,
+		int *old_fd);
 
 //	child_process.c
 void	child_process2(t_params *params, int i, int *new_fds, int *old_fds);
@@ -116,6 +118,7 @@ void	skip_quoted_chars(char *temp, int *flag);
 int		open_redirects(t_params *params, int i);
 
 //	cd_builtin2.c
+int		free_cd_strings(char *oldpwd, char **dir_arr, int flag);
 char	*find_env_var_value(t_env *head_env, char *var);
 int		check_valid_dir(t_env **head_env, char *dir_arr, char **new_path,
 			char *path);
@@ -123,9 +126,9 @@ int		check_present_dir(t_env **head_env, char *path);
 int		search_dir_arr(t_env **head_env, char **dir_arr, char *path);
 
 //	cd_builtin.c
-int		free_cd_strings(char *oldpwd, char *pwd, char **dir_arr, int flag);
 //int		free_cd_strings(har **dir_arr, int flag);
 int		check_dir_path_has_c(char *dir_path, char c);
+void	cd_wrapper2(t_env **head_env, char *oldpwd, char *ch_path);
 int		cd_wrapper(t_env **head_env, char *new_path, char *path,
 			char **dir_arr);
 int		different_cd_criteria(t_env **head_env, char **cmd_args, char *cd_path,
@@ -172,16 +175,17 @@ int		locate_command_names(t_params *params, int i);
 //	copy_token_from_line2.c
 void	copy_meta_char(char **temp, char *token_arr, int *i);
 int		copy_quote_len(char **temp, int *i, char *token_arr, t_env *head_env);
-int		move_ptr_past_var(char **temp, t_env **head_env);
 
 //	copy_token_from_line.c
+int		move_ptr_past_var(char **temp, t_env **head_env);
+int		dont_copy_if_invalid_var(char **temp, t_env *head_env);
 void	copy_var_len(char **temp, char *token_arr, int *i, t_env *head_env);
 void	copy_regular_len(char **temp, char *token_arr, int *i);
-int		copy_token_from_line(char **temp, char *token_arr, t_env *head_env);
+void	copy_token_from_line(char **temp, char *token_arr, t_env *head_env);
 
 //	count_token_len.c
 void	count_var_len2(char **temp, int *token_len, t_env *head_env, int j);
-void	count_var_len(char **temp, int *token_len, t_env *head_env);
+void	count_var_len(char **temp, int *token_len, t_env *head_env, int flag);
 void	count_regular_len(char **temp, int *token_len);
 
 //	parse_input_string.c

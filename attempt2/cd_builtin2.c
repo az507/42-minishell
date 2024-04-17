@@ -6,11 +6,19 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 19:28:30 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 18:24:02 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/17 17:30:08 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
+
+int	free_cd_strings(char *oldpwd, char **dir_arr, int flag)
+{
+	free(oldpwd);
+	if (dir_arr)
+		free_array(dir_arr);
+	return (flag);
+}
 
 char	*find_env_var_value(t_env *head_env, char *var)
 {
@@ -60,10 +68,10 @@ int	check_present_dir(t_env **head_env, char *path)
 
 int	search_dir_arr(t_env **head_env, char **dir_arr, char *path)
 {
-	int			i;
-	int			j;
-	int			flag;
-	char		*new_path;
+	int		i;
+	int		j;
+	int		flag;
+	char	*new_path;
 
 	i = -1;
 	flag = -1;
