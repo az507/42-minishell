@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:36:16 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 19:15:57 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 14:36:12 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,28 +70,14 @@ int	count_token_len(char *temp, t_env *head_env)
 			&& *temp != '>' && *temp && !is_whitespace(*temp))
 		{
 			if (*temp == 39 || *temp == '"')
-			{
-	//			printf(" (A)\n");
-				count_quote_len(&temp,
-					*temp, &token_len, head_env);
-			}
+				count_quote_len(&temp, *temp, &token_len, head_env);
 			else if (*temp == '$')
-			{
-	//			printf(" (B)\n");
-				count_var_len(&temp, &token_len,
-					head_env, flag);
-			}
+				count_var_len(&temp, &token_len, head_env, flag);
 			else if (!is_whitespace(*temp))
-			{
-	//			printf(" (C)\n");
 				count_regular_len(&temp, &token_len);
-			}
 			flag = 1;
-			//printf("-----temp = %s\n", temp);
-			//printf("-----token_len = %d\n", token_len);
 		}
 	}
-	//printf(">>>>> final token_len = %d\n", token_len);
 	return (token_len);
 }
 
@@ -131,7 +117,6 @@ char	**parse_input_string(char *line_read, t_env *head_env)
 	char	**token_arr;
 
 	token_nbr = count_nbr_of_tokens(line_read, head_env);
-	//printf("token_nbr = %d\n", token_nbr);
 	if (!token_nbr)
 		return (NULL);
 	i = -1;
@@ -146,9 +131,6 @@ char	**parse_input_string(char *line_read, t_env *head_env)
 			if (!token_arr)
 				break ;
 		}
-//		int	j = -1;
-//		while (token_arr[++j])
-//			printf("token_arr[%d] = %s\n", j, token_arr[j]);
 	}
 	return (token_arr);
 }

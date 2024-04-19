@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 13:27:15 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 21:32:01 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 15:33:05 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,24 @@ int	check_and_assign_cmd_path(t_params *params, int i, char **arr_path)
 	return (check_and_assign_cmd_path2(params, i));
 }
 
+int	check_if_path_var_exists(t_env *temp, t_params *params, int i,
+		char ***arr_path)
+{
+	if (temp)
+	{
+		*arr_path = ft_split(temp->value, ':');
+		if (!*arr_path)
+			free_array(*arr_path);
+	}
+	else
+	{
+		if (access(params->cmd_arr[i].cmd_args[0], F_OK | X_OK) == -1)
+			perror(params->cmd_arr[i].cmd_args[0]);
+		return (-1);
+	}
+	return (0);
+}
+
 int	locate_command_names(t_params *params, int i)
 {
 	char	**arr_path;
@@ -89,18 +107,8 @@ int	locate_command_names(t_params *params, int i)
 				break ;
 		temp = temp->next;
 	}
-	if (temp)
-	{
-		arr_path = ft_split(temp->value, ':');
-		if (!*arr_path)
-			free_array(arr_path);
-	}
-	else
-	{
-		if (access(params->cmd_arr[i].cmd_args[0], F_OK | X_OK) == -1)
-			perror(params->cmd_arr[i].cmd_args[0]);
+	if (check_if_path_var_exists(temp, params, i, &arr_path) == -1)
 		return (-1);
-	}
 	if (!check_and_assign_cmd_path(params, i, arr_path))
 		return (-1);
 	return (0);

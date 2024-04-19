@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 11:36:58 by achak             #+#    #+#             */
-/*   Updated: 2024/04/16 12:33:57 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 12:30:51 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,12 @@ int	copy_strs_to_envp_arr(int i, char **envp, t_env *temp)
 	env_len = my_strlen(temp->key) + my_strlen(temp->value);
 	envp[i] = malloc(sizeof(char) * (env_len + 2));
 	if (!envp[i])
+	{
+		while (--i >= 0)
+			free(envp[i]);
+		free(envp);
 		return (-1);
+	}
 	envp[i][env_len + 1] = '\0';
 	while (++k < my_strlen(temp->key))
 		envp[i][++j] = temp->key[k];
@@ -66,11 +71,7 @@ char	**create_envp_arr(t_env *head_env)
 		while (++i < env_nbr && temp)
 		{
 			if (copy_strs_to_envp_arr(i, envp, temp) == -1)
-			{
-				while (--i >= 0)
-					free(envp[i]);
 				return (NULL);
-			}
 			temp = temp->next;
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 13:40:53 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 20:31:07 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/19 13:51:41 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,11 @@ int	check_type_of_redirect(char *temp)
 
 void	close_existing_fds(t_params *params, int i, int open_mode)
 {
-//	printf("params->cmd_arr[%d].stdin_fd = %d\n", i, params->cmd_arr[i].stdin_fd);
-//	printf("params->cmd_arr[%d].heredoc_rightmost = %d\n", i,
-//		params->cmd_arr[i].heredoc_rightmost);
-	//printf("params->cmd_arr[%d].stdout_fd = %d\n", i, params->cmd_arr[i].stdout_fd);
 	if ((open_mode == 1 || open_mode == 2)
 		&& params->cmd_arr[i].stdout_fd != -2)
 		wrapper(close(params->cmd_arr[i].stdout_fd), "close");
 	else if (open_mode == 3 && params->cmd_arr[i].heredoc_rightmost == 0
-			&& params->cmd_arr[i].stdin_fd != -2)
+		&& params->cmd_arr[i].stdin_fd != -2)
 	{
 		wrapper(close(params->cmd_arr[i].stdin_fd), "close");
 		if (params->cmd_arr[i].heredoc)
@@ -77,7 +73,8 @@ void	erase_redirs_from_str(char **temp, int *flag)
 			*flag = 1;
 		else if (**temp == '"')
 			*flag = 2;
-		else if (is_whitespace(**temp))
+		else if (is_whitespace(**temp) || **temp == '<' || **temp == '>'
+			|| **temp == '|')
 		{
 			*flag = 3;
 			break ;

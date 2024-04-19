@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 13:33:43 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 17:32:56 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 12:58:58 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ int	execute_builtin(t_params *params, int i, int flag, int *old_fd)
 	{
 		free_symbol_table(params->head_env);
 		free(old_fd);
+		rl_clear_history();
 		exit(exit_status);
 	}
 	else

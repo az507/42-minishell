@@ -6,21 +6,27 @@
 #    By: achak <marvin@42.fr>                       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/31 14:40:12 by achak             #+#    #+#              #
-#    Updated: 2024/04/03 15:57:25 by achak            ###   ########.fr        #
+#    Updated: 2024/04/18 13:27:06 by achak            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= minishell
-CC	= cc -g -Wall -Werror -Wextra
+CC1	= cc -g -Wall -Werror -Wextra
+CC2	= cc -g -Wall -Werror -Wextra -fsanitize=memory
+#CC2	= cc -g -Wall -Werror -Wextra -fsanitize=address -fno-omit-frame-pointer \
+	  -fno-optimize-sibling-calls
 SRCS	= $(wildcard *.c)
 
 all:	$(NAME)
 
 $(NAME):$(SRCS)
-	$(CC) $(SRCS) -o $(NAME) -lreadline
+	$(CC1) $(SRCS) -o $(NAME) -lreadline
 
-test:
-	make re && clear && valgrind --leak-check=full ./$(NAME)
+test1:
+	make re && clear && valgrind ./$(NAME)
+
+test2:
+	make re && clear && ./$(NAME)
 
 clean:
 ifneq ("$(wildcard $(NAME))","")

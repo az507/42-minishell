@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 11:27:27 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 17:53:22 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 12:22:55 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ char	*strjoin_and_free_str(char *s1, char *s2, int str_nbr)
 	int		i;
 	int		j;
 
-	i = 0;
+	i = -1;
 	j = -1;
 	if (!s1 || !s2)
 		return (NULL);
@@ -70,11 +70,8 @@ char	*strjoin_and_free_str(char *s1, char *s2, int str_nbr)
 	str[str_len] = '\0';
 	if (s1 != NULL)
 	{
-		while (s1[i])
-		{
+		while (s1[++i])
 			str[i] = s1[i];
-			i++;
-		}
 	}
 	while (s2[++j])
 		str[i++] = s2[j];

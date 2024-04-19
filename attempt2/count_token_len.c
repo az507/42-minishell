@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 09:40:12 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 19:29:35 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 15:25:58 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,6 @@ void	count_var_len2(char **temp, int *token_len, t_env *head_env, int j)
 			&& ((*temp)[0] != '_') && ((*temp)[0] != '?')))
 		{
 			(*temp) += j;
-//			if (flag == 0 && *token_len == 0)
-//				while (**temp && is_whitespace(**temp))
-//					(*temp)++;
 			return ;
 		}
 		(*token_len) += my_strlen(head_env->value);
@@ -31,6 +28,21 @@ void	count_var_len2(char **temp, int *token_len, t_env *head_env, int j)
 	else
 		(*token_len)++;
 	(*temp) += j;
+}
+
+void	dont_count_if_invalid_var(char **temp, int j, int *token_len)
+{
+	if (!is_alphabet(**temp) && **temp != '_' && **temp != '?' && j == 0)
+	{
+		(*token_len)++;
+		return ;
+	}
+	*temp += j;
+	if (**temp && is_whitespace(**temp) && j != 0)
+	{
+		while (**temp && is_whitespace(**temp))
+			(*temp)++;
+	}
 }
 
 void	count_var_len(char **temp, int *token_len, t_env *head_env, int flag)
@@ -53,22 +65,8 @@ void	count_var_len(char **temp, int *token_len, t_env *head_env, int flag)
 			break ;
 		head_env = head_env->next;
 	}
-	if (!head_env && flag == 0 && *token_len == 0)
-	{
-		//printf("?????????????????????????????????????????????\n");
-		//printf("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
-		*temp += j;
-		//printf("99999999999999    *temp =%s\n", *temp);
-		if (**temp && is_whitespace(**temp))
-		{
-			while (**temp && is_whitespace(**temp))
-			{
-				(*temp)++;
-				//printf("88888888888    *temp =%s\n", *temp);
-			}
-		}
-		return ;
-	}
+	if ((!head_env || j == 0) && flag == 0 && *token_len == 0)
+		return (dont_count_if_invalid_var(temp, j, token_len));
 	count_var_len2(temp, token_len, head_env, j);
 }
 

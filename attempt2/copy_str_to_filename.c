@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 13:29:59 by achak             #+#    #+#             */
-/*   Updated: 2024/04/13 13:44:21 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/19 15:46:54 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,11 @@ int	copy_str_to_filename2(char *filename, char *temp, int *flag, int *k)
 		*flag = 1;
 	else if (*temp == '"')
 		*flag = 2;
+	else if (is_whitespace(*temp) || *temp == '<' || *temp == '>'
+		|| *temp == '|')
+		return (0);
 	else if (!is_whitespace(*temp))
 		filename[(*k)++] = *temp;
-	else if (is_whitespace(*temp))
-		return (0);
 	return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/24 13:40:40 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 20:34:03 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 15:28:22 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	iterate_thru_quotes(char **temp, char quote, int *count, int *flag)
 	while (**temp != quote && **temp)
 		(*temp)++;
 	if (**temp == quote)
-		(*temp)++;		
+		(*temp)++;
 	if (!*flag)
 	{
 		(*count)++;
@@ -35,21 +35,14 @@ void	check_if_valid_var(char **temp, t_env *head_env, int *count, int *flag)
 
 	i = 0;
 	(*temp)++;
-//	while (!is_whitespace((*temp)[i]) && (*temp)[i] != '|'
-//		&& (*temp)[i] != '<' && (*temp)[i] != '>' && (*temp)[i]
-//		&& (*temp)[i] != 39 && (*temp)[i] != '"' && (*temp)[i] != '$')
-//		if ((*temp)[i++] == '?')
-//			break ;
 	while ((*temp)[i] && (is_alphabet((*temp)[i]) || is_numeric((*temp)[i])
 		|| (*temp)[i] == '_' || (*temp)[i] == '?'))
 	{
-		if (is_numeric((*temp)[i]) && i == 0)
-			break ;
-		else if ((*temp)[i] == '?' && i != 0)
+		if ((is_numeric((*temp)[i]) && i == 0)
+			|| ((*temp)[i] == '?' && i != 0))
 			break ;
 		i++;
 	}
-	//printf("i = %d\n", i);
 	while (head_env)
 	{
 		if (!my_strncmp(*temp, head_env->key, i))
@@ -57,14 +50,19 @@ void	check_if_valid_var(char **temp, t_env *head_env, int *count, int *flag)
 		head_env = head_env->next;
 	}
 	*temp += i;
-	if (!head_env)
-		return ;
-	if (!*flag)
+	if ((i == 0 || head_env) && !*flag)
 	{
 		(*count)++;
 		*flag = 1;
 	}
 }
+/*
+//	if (head_env && !*flag)
+//	{
+//		(*count)++;
+//		*flag = 1;
+//	}
+*/
 
 int	count_nbr_of_tokens(char *line_read, t_env *head_env)
 {

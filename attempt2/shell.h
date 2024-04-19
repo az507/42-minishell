@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 14:38:48 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 21:40:49 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/19 16:51:22 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,47 +32,53 @@
 
 typedef struct s_env
 {
-	char		*key;
-	char		*value;
+	char			*key;
+	char			*value;
 	struct s_env	*next;
 }	t_env;
 
 typedef struct s_command
 {
 	char	**cmd_args;
-	//char	**filenames;
 	char	*cmd_path;
 	char	*raw_str;
 	char	*heredoc;
 	int		stdin_fd;
 	int		stdout_fd;
-	//int		heredoc_fd;
 	int		heredoc_rightmost;
 }	t_command;
 
 typedef struct s_params
 {
-	char	*line_read;
+	char		*line_read;
 	t_command	*cmd_arr;
-	//int		heredoc_count;
-	int		cmd_nbr;
-	t_env	**head_env;
+	int			cmd_nbr;
+	t_env		**head_env;
 }	t_params;
 
-static volatile sig_atomic_t	async = 0;
+//static volatile sig_atomic_t	async = 0;
 //volatile sig_atomic_t	loop = 0;
 
 //	main.c
-int		count_len_til_pipe(char *temp);
-void	copy_line_til_pipe(t_params *params, int i, char **temp);
 int		split_raw_str_by_pipes(t_params *params, char *line_read);
 void	main_shell_loop(t_params *params, char *line_read);
+
+//	count_len_til_pipe.c
+void	copy_chars_in_quoted_str(t_params *params, int i, char **temp, int *j);
+int		copy_line_til_pipe2(char *raw_str, int *j, char **temp,
+			int *flag);
+void	copy_line_til_pipe(t_params *params, int i, char **temp);
+
+//	copy_len_til_pipe.c
+void	count_chars_in_quoted_str(char **temp, int *count);
+int		count_len_til_pipe2(char **temp, int *flag, int *count);
+int		count_len_til_pipe(char *temp);
 
 //	misc_funcs_for_main.c
 void	signal_handler(int sig);
 void	set_up_signals(void);
 void	init_cmd_arr(t_params *params, t_command *cmd_arr, int cmd_nbr,
-		char *line_read);
+			char *line_read);
 void	init_params(t_params *params, t_env **head_env);
 void	check_read_line_eof(char *line_read, int flag, t_params *params);
 
@@ -80,19 +86,24 @@ void	check_read_line_eof(char *line_read, int flag, t_params *params);
 void	settle_child_process_stdin2(t_params *params, int i);
 void	settle_child_process_stdin3(t_params *params, int i, int *old_fd);
 void	settle_child_process_stdin(t_params *params, int i, int *new_fd,
-		int *old_fd);
+			int *old_fd);
 void	settle_child_process_stdout2(t_params *params, int i, int *new_fd);
 void	settle_child_process_stdout(t_params *params, int i, int *new_fd,
-		int *old_fd);
+			int *old_fd);
 
 //	child_process.c
-void	child_process2(t_params *params, int i, int *new_fds, int *old_fds);
-void	child_process(t_params *params, int i, int *new_fds, int *old_fds);
+void	cleanup_in_child_process(t_params *params, char **envp, int *new_fds,
+			int *old_fds);
+void	call_execve(t_params *params, int i, int *new_fds, int *old_fds);
+int		child_process2(t_params *params, int i, int *new_fds, int *old_fds);
+int		child_process1(t_params *params, int i, int *new_fds, int *old_fds);
+int		child_process(t_params *params, int i, int *new_fds, int *old_fds);
 
 //	copy_str_to_filename.c
 t_env	*is_valid_var(t_env *temp_env, char *temp, int j);
 int		copy_valid_var(t_env *temp_env, char *filename, int *k);
-void	copy_var_len_redir(t_params *params, char **temp, int *k, char *filename);
+void	copy_var_len_redir(t_params *params, char **temp, int *k,
+			char *filename);
 int		copy_str_to_filename2(char *filename, char *temp, int *flag, int *k);
 void	copy_str_to_filename(t_params *params, char *filename, char *temp);
 
@@ -112,7 +123,7 @@ void	erase_redirs_from_str(char **temp, int *flag);
 //	open_redirects.c
 int		perror_filename(char *filename, int open_mode);
 int		open_new_files(t_params *params, int i, int open_mode,
-		char *filename);
+			char *filename);
 int		settle_redirects(t_params *params, int i, char **temp);
 void	skip_quoted_chars(char *temp, int *flag);
 int		open_redirects(t_params *params, int i);
@@ -156,20 +167,26 @@ void	restore_stdin_and_stdout(int dup_stdin, int dup_stdout);
 void	choose_which_builtin_to_exec(t_params *params, int i, int *exit_status);
 int		execute_builtin(t_params *params, int i, int flag, int *old_fds);
 
+//	check_if_first_cmd_is_builtin.c
+int		check_if_cmd_is_builtin(char *cmd);
+int		check_if_fork_needed(t_params *params, char *line_read);
+void	skip_redir_and_filename(char **line_read);
+int		determine_whats_first_word(char *line_read, t_env *head_env);
+int		check_if_first_cmd_is_builtin(char *line_read, t_env *head_env);
+
 //	fork_and_execve.c
 void	wrapper(int func_rv, const char *func_name);
-int		check_if_cmd_is_builtin(char *cmd);
-char	*check_if_fork_neededd(t_params *params, char *line_read);
-void	skip_redir_and_filename(char **line_read);
-char	*determine_whats_first_word(char *line_read, t_env *head_env);
-char	*check_if_first_cmd_is_builtin(char *line_read, t_env *head_env);
 void	fork_and_execve(t_params *params, int i, int *new_fds, int *old_fds);
+void	set_exit_status(t_params *params, int wstatus);
+void	parent_waits_for_children(t_params *params, int *old_fds);
 void	preparing_fork_and_execve(t_params *params, char *line_read);
 
 //	locate_command_names.c
 int		check_for_char_in_str(char *str, char c);
 int		check_and_assign_cmd_path2(t_params *params, int i);
 int		check_and_assign_cmd_path(t_params *params, int i, char **arr_path);
+int		check_if_path_var_exists(t_env *temp, t_params *params, int i,
+			char ***arr_path);
 int		locate_command_names(t_params *params, int i);
 
 //	copy_token_from_line2.c
@@ -178,13 +195,15 @@ int		copy_quote_len(char **temp, int *i, char *token_arr, t_env *head_env);
 
 //	copy_token_from_line.c
 int		move_ptr_past_var(char **temp, t_env **head_env);
-int		dont_copy_if_invalid_var(char **temp, t_env *head_env);
+void	dont_copy_if_invalid_var(char **temp, char *token_arr, int j,
+			int *i);
 void	copy_var_len(char **temp, char *token_arr, int *i, t_env *head_env);
 void	copy_regular_len(char **temp, char *token_arr, int *i);
 void	copy_token_from_line(char **temp, char *token_arr, t_env *head_env);
 
 //	count_token_len.c
 void	count_var_len2(char **temp, int *token_len, t_env *head_env, int j);
+void	dont_count_if_invalid_var(char **temp, int j, int *token_len);
 void	count_var_len(char **temp, int *token_len, t_env *head_env, int flag);
 void	count_regular_len(char **temp, int *token_len);
 
@@ -208,29 +227,56 @@ void	iterate_thru_meta_char(char **temp, int *count, int *flag);
 void	iterate_thru_word(char **temp, int *count, int *flag);
 void	reset_flag_for_new_word(char **line_read, int *flag);
 
-//	check_syntax.c
-int		check_after_meta_char(char **line_read);
-int		check_redir_syntax(char *line_read);
-int		check_syntax_around_pipe(char **line_read);
+//	nbr_of_pipes.c
+void	skip_til_end_of_quotes(char **line_read);
+int		count_if_valid_pipe(char **line_read, int *flag, int *nbr);
 int		nbr_of_pipes(char *line_read);
 int		check_empty_line(char *line_read);
 
-//	alloc_new_heredoc.c
+//	check_syntax.c
+int		check_after_meta_char2(char **line_read);
+int		check_after_meta_char(char **line_read);
+int		check_redir_syntax(char *line_read);
+int		check_syntax_around_pipe(char **line_read);
+
+//	alloc_new_heredoc_copy.c
 int		look_for_env_var(char *str);
+void	copy_heredoc_for_var(char **str, char *here_doc, int *i, t_env *temp);
 void	copy_new_heredoc(char *str, char *here_doc, t_params *params);
+
+//	alloc_new_heredoc_count.c
 char	*alloc_new_heredoc(char *str, t_params *params);
+void	count_heredoclen_for_var(char **str, int *count, t_params *params);
 int		count_new_heredoc_len(char *str, t_params *params);
 
-//	open_all_heredocs.c
+//	count_delim_len.c
 int		check_quotes_in_heredoc_delim(char *line_read);
+void	go_thru_quotes_for_delim(char **line_read, int *delim_len, int *flag);
+int		count_delim_len_redir(char **line_read, int *delim_len, int *flag);
 int		count_delim_len(char *line_read);
+
+//	alloc_delim_str.c
+void	copy_quoted_parts_in_delim(char **line_read, char *delim, int *flag,
+			int *i);
+int		copy_delim_str_redir(char **line_read, char *delim, int *flag,
+			int *i);
+void	copy_delim_str(char *line_read, char *delim, int flag, int i);
 char	*alloc_delim_str(char *line_read, int delim_len);
-void	save_heredoc_to_struct(t_params *params, int i, int fd2, char *heredoc);
+
+//	ft_heredoc.c
+void	save_heredoc_to_struct(t_command *cmd_arr, int fd1, int fd2,
+			char *heredoc);
+int		check_heredoc_eof(char *str, char *delim);
 void	ft_heredoc(t_params *params, int i, char *delim, int flag);
+void	ignore_quotes_finding_other_heredocs(char **line_read, int *flag);
 int		is_heredoc_rightmost(char *line_read, int delim_len);
+
+//	open_all_heredocs.c
+void	erase_quoted_portion_in_heredoc(char **line_read, int *flag);
 void	erase_heredoc_and_delim(char **line_read, int *flag);
-void	erase_heredoc_and_delim(char **line_read, int *flag);
+//void	erase_heredoc_and_delim(char **line_read, int *flag);
 void	check_for_heredoc(t_params *params, int i, char **line_read);
+void	ignore_quotes_looking_for_heredoc(char **line_read, int *flag);
 int		open_all_heredocs(t_params *params, char *line_read);
 
 //	create_symbol_table.c

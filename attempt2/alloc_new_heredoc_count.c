@@ -1,87 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   alloc_new_heredoc.c                                :+:      :+:    :+:   */
+/*   alloc_new_heredoc_count.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/30 09:50:41 by achak             #+#    #+#             */
-/*   Updated: 2024/04/07 17:57:45 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 16:06:15 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
-
-int	look_for_env_var(char *str)
-{
-	int	flag;
-
-	flag = 0;
-	while (*str)
-	{
-		if (flag && (is_alphabet(*str) || *str == '_'
-				|| *str == '?'))
-			return (1);
-		else
-			flag = 0;
-		if (*str == '$')
-			flag = 1;
-		str++;
-	}
-	return (0);
-}
-
-void	copy_new_heredoc(char *str, char *here_doc, t_params *params)
-{
-	int		i;
-	int		j;
-	int		k;
-	t_env	*temp;
-
-	i = -1;
-	while (*str)
-	{
-		if (*str == '$' && *(str + 1))
-		{
-			str++;
-			if (is_alphabet(*str) || *str == '_' || *str == '?')
-			{
-				j = 1;
-				if (str[j])
-				{
-					while (str[j] && (is_alphabet(str[j])
-						|| is_numeric(str[j]) || str[j] == '_'))
-						j++;
-				}
-				temp = *(params->head_env);
-				while (temp)
-				{
-					if (!my_strncmp(str, temp->key, j))
-						break ;
-					temp = temp->next;
-				}
-				if (temp)
-				{
-					if (temp->value)
-					{
-						k = 0;
-						while (temp->value[k])
-							here_doc[++i] = temp->value[k++];
-					}
-				}
-				str += j - 1;
-			}
-			else
-			{
-				here_doc[++i] = '$';
-				here_doc[++i] = *str;
-			}
-		}
-		else
-			here_doc[++i] = *str;
-		str++;
-	}
-}
 
 char	*alloc_new_heredoc(char *str, t_params *params)
 {
@@ -99,11 +28,54 @@ char	*alloc_new_heredoc(char *str, t_params *params)
 	return (here_doc);
 }
 
-int	count_new_heredoc_len(char *str, t_params *params)
+void	count_heredoclen_for_var(char **str, int *count, t_params *params)
 {
 	int		i;
-	int		count;
 	t_env	*temp;
+
+	i = 1;
+	temp = *(params->head_env);
+	if ((*str)[i])
+	{
+		while ((*str)[i] && (is_alphabet((*str)[i])
+			|| is_numeric((*str)[i]) || (*str)[i] == '_'))
+			i++;
+	}
+	while (temp)
+	{
+		if (!my_strncmp(*str, temp->key, i))
+			break ;
+		temp = temp->next;
+	}
+	if (temp)
+		if (temp->value)
+			*count += my_strlen(temp->value);
+	*str += i - 1;
+}
+/*
+//				i = 1;
+//				if (str[i])
+//				{
+//					while (str[i] && (is_alphabet(str[i])
+//						|| is_numeric(str[i]) || str[i] == '_'))
+//						i++;
+//				}
+//				temp = *(params->head_env);
+//				while (temp)
+//				{
+//					if (!my_strncmp(str, temp->key, i))
+//						break ;
+//					temp = temp->next;
+//				}
+//				if (temp)
+//					if (temp->value)
+//						count += my_strlen(temp->value);
+//				str += i - 1;
+*/
+
+int	count_new_heredoc_len(char *str, t_params *params)
+{
+	int	count;
 
 	count = 0;
 	while (*str)
@@ -112,26 +84,7 @@ int	count_new_heredoc_len(char *str, t_params *params)
 		{
 			str++;
 			if (is_alphabet(*str) || *str == '_' || *str == '?')
-			{
-				i = 1;
-				if (str[i])
-				{
-					while (str[i] && (is_alphabet(str[i])
-						|| is_numeric(str[i]) || str[i] == '_'))
-						i++;
-				}
-				temp = *(params->head_env);
-				while (temp)
-				{
-					if (!my_strncmp(str, temp->key, i))
-						break ;
-					temp = temp->next;
-				}
-				if (temp)
-					if (temp->value)
-						count += my_strlen(temp->value);
-				str += i - 1;
-			}
+				count_heredoclen_for_var(&str, &count, params);
 			else
 				count += 2;
 		}

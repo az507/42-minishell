@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 13:26:49 by achak             #+#    #+#             */
-/*   Updated: 2024/04/13 13:35:52 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/19 16:30:31 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,11 @@ int	count_word_len2(char *temp, int *word_len, int *flag)
 		*flag = 1;
 	else if (*temp == '"')
 		*flag = 2;
+	else if (is_whitespace(*temp) || *temp == '<' || *temp == '>'
+		|| *temp == '|')
+		return (0);
 	else if (!is_whitespace(*temp))
 		(*word_len)++;
-	else if (is_whitespace(*temp))
-		return (0);
 	return (1);
 }
 

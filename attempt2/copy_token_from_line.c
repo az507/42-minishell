@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 12:04:37 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 21:40:23 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/18 15:25:26 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,17 +34,19 @@ int	move_ptr_past_var(char **temp, t_env **head_env)
 	return (j);
 }
 
-int	dont_copy_if_invalid_var(char **temp, t_env *head_env)
+void	dont_copy_if_invalid_var(char **temp, char *token_arr, int j, int *i)
 {
-	if (!head_env)
+	if (!is_alphabet(**temp) && **temp != '_' && **temp != '?' && j == 0)
 	{
-		(*temp) += j;
-		if (*i == -1 && **temp && is_whitespace(**temp))
-			while (**temp && is_whitespace(**temp))
-				(*temp)++;
-		return (1);
+		token_arr[++(*i)] = '$';
+		return ;
 	}
-	return (0);
+	(*temp) += j;
+	if (*i == -1 && **temp && is_whitespace(**temp) && j != 0)
+	{
+		while (**temp && is_whitespace(**temp))
+			(*temp)++;
+	}
 }
 
 // Need to account for var len for '$?' ?
@@ -56,8 +58,8 @@ void	copy_var_len(char **temp, char *token_arr, int *i, t_env *head_env)
 	k = 0;
 	(*temp)++;
 	j = move_ptr_past_var(temp, &head_env);
-	if (dont_copy_if_invalid_var(temp, &head_env) == 1)
-		return ;
+	if (!head_env || j == 0)
+		return (dont_copy_if_invalid_var(temp, token_arr, j, i));
 	if ((*temp)[0] && j != 0)
 	{
 		if (!(((*temp)[0] >= 'a' && (*temp)[0] <= 'z')
