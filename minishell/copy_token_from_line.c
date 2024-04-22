@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 12:04:37 by achak             #+#    #+#             */
-/*   Updated: 2024/04/18 15:25:26 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 15:34:14 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,12 @@ int	move_ptr_past_var(char **temp, t_env **head_env)
 			|| (*temp)[j] == '_' || (*temp)[j] == '?'))
 	{
 		if ((is_numeric((*temp)[j]) && j == 0)
-			|| ((*temp)[j] == '?' && j != 0))
+			|| ((*temp)[j] == '?'))
+		{
+			if ((*temp)[j] == '?' && j == 0)
+				j = 1;
 			break ;
+		}
 		j++;
 	}
 	while (*head_env)

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 11:29:29 by achak             #+#    #+#             */
-/*   Updated: 2024/04/03 10:48:53 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 15:55:23 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,34 +46,32 @@ void	free_cmd_arr(t_command *cmd_arr, int cmd_nbr)
 	i = -1;
 	while (++i < cmd_nbr)
 	{
-		if (cmd_arr[i].here_doc)
+		if (cmd_arr[i].heredoc)
 		{
-			if (access(cmd_arr[i].here_doc, F_OK) == 0)
-				wrapper(unlink(cmd_arr[i].here_doc), "unlink");
-			free(cmd_arr[i].here_doc);
+			if (access(cmd_arr[i].heredoc, F_OK) == 0)
+				unlink(cmd_arr[i].heredoc);
+			free(cmd_arr[i].heredoc);
 		}
 		if (cmd_arr[i].cmd_args)
-			free(cmd_arr[i].cmd_args);
+			free_array(cmd_arr[i].cmd_args);
 		if (cmd_arr[i].cmd_path)
 			free(cmd_arr[i].cmd_path);
-		if (cmd_arr[i].stdin_fds)
-			free(cmd_arr[i].stdin_fds);
-		if (cmd_arr[i].stdout_fds)
-			free(cmd_arr[i].stdout_fds);
+		if (cmd_arr[i].raw_str)
+			free(cmd_arr[i].raw_str);
 	}
 	free(cmd_arr);
 	cmd_arr = NULL;
 }
 
-void	handle_exit_failure(char **token_arr, t_params *params)
+void	cleanup_params(t_params *params)
 {
-	if (!token_arr && params->token_arr)
-		token_arr = params->token_arr;
-	if (token_arr)
-		free_array(token_arr);
 	if (params)
 	{
+		if (params->line_read)
+			free(params->line_read);
 		if (params->cmd_arr)
 			free_cmd_arr(params->cmd_arr, params->cmd_nbr);
+		if (params->pid_arr)
+			free(params->pid_arr);
 	}
 }

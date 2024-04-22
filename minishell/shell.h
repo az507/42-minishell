@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 14:38:48 by achak             #+#    #+#             */
-/*   Updated: 2024/04/22 09:53:22 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 15:48:00 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,6 +226,7 @@ char	**parse_input_string(char *line_read, t_env *head_env);
 
 //	count_nbr_of_tokens.c
 void	iterate_thru_quotes(char **temp, char quote, int *count, int *flag);
+void	check_if_valid_var2(char **temp, int *i);
 void	check_if_valid_var(char **temp, t_env *head_env, int *count, int *flag);
 int		count_nbr_of_tokens(char *line_read, t_env *head_env);
 

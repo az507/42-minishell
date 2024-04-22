@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 09:40:12 by achak             #+#    #+#             */
-/*   Updated: 2024/04/18 15:25:58 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 15:32:24 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,12 @@ void	count_var_len(char **temp, int *token_len, t_env *head_env, int flag)
 		|| (*temp)[j] == '_' || (*temp)[j] == '?'))
 	{
 		if ((is_numeric((*temp)[j]) && j == 0)
-			|| ((*temp)[j] == '?' && j != 0))
+			|| ((*temp)[j] == '?'))
+		{
+			if ((*temp)[j] == '?' && j == 0)
+				j = 1;
 			break ;
+		}
 		j++;
 	}
 	while (head_env)

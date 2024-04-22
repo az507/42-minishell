@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 12:55:20 by achak             #+#    #+#             */
-/*   Updated: 2024/04/22 10:02:26 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 15:55:03 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ void	parent_waits_for_children(t_params *params, int *old_fds)
 		waitpid(params->pid_arr[j++], NULL, 0);
 	waitpid(params->pid_arr[j], &wstatus, 0);
 	free(params->pid_arr);
+	params->pid_arr = NULL;
 	if (WIFEXITED(wstatus))
 		set_exit_status(params, wstatus, 0);
 	else if (WIFSIGNALED(wstatus))
