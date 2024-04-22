@@ -6,33 +6,11 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 18:48:08 by achak             #+#    #+#             */
-/*   Updated: 2024/04/18 15:26:31 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 09:53:12 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
-
-void	signal_handler(int sig)
-{
-	if (sig == SIGINT)
-	{
-		write(STDIN_FILENO, "\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-}
-
-void	set_up_signals(void)
-{
-	struct sigaction	act;
-
-	act.sa_handler = signal_handler;
-	act.sa_flags = 0;
-	sigemptyset(&act.sa_mask);
-	sigaction(SIGINT, &act, NULL);
-	signal(SIGQUIT, SIG_IGN);
-}
 
 void	init_cmd_arr(t_params *params, t_command *cmd_arr, int cmd_nbr,
 		char *line_read)
@@ -61,6 +39,7 @@ void	init_params(t_params *params, t_env **head_env)
 {
 	params->line_read = NULL;
 	params->cmd_arr = NULL;
+	params->pid_arr = NULL;
 	params->cmd_nbr = 0;
 	params->head_env = head_env;
 }

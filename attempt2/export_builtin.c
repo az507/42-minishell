@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 16:37:34 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 17:43:29 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 09:15:27 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ int	check_if_entry_exists(char *var, t_env *head_env)
 	int	i;
 
 	i = 0;
+	if (!var)
+		return (0);
 	while (var[i] && var[i] != '=')
 		i++;
 	while (head_env)

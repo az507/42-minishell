@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 16:46:40 by achak             #+#    #+#             */
-/*   Updated: 2024/04/19 16:29:32 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/21 14:57:28 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	erase_heredoc_and_delim(char **line_read, int *flag)
 	}
 }
 
-void	check_for_heredoc(t_params *params, int i, char **line_read)
+int	check_for_heredoc(t_params *params, int i, char **line_read)
 {
 	int		delim_len;
 	int		flag;
@@ -82,12 +82,14 @@ void	check_for_heredoc(t_params *params, int i, char **line_read)
 		params->cmd_arr[i].heredoc_rightmost
 			= is_heredoc_rightmost(*line_read, delim_len);
 		if (delim)
-			ft_heredoc(params, i, delim, flag);
+			if (ft_heredoc(params, i, delim, flag) == -1)
+				return (-1);
 		flag = 0;
 		erase_heredoc_and_delim(line_read, &flag);
 	}
 	else
 		(*line_read)++;
+	return (0);
 }
 
 void	ignore_quotes_looking_for_heredoc(char **line_read, int *flag)
@@ -124,13 +126,11 @@ int	open_all_heredocs(t_params *params, char *line_read)
 			ignore_quotes_looking_for_heredoc(&line_read, &flag);
 			continue ;
 		}
-		else if (*line_read == '<')
+		else if (*line_read == '<' && *(line_read + 1))
 		{
-			if (*(line_read + 1))
-			{
-				check_for_heredoc(params, i, &line_read);
-				continue ;
-			}
+			if (check_for_heredoc(params, i, &line_read) == -1)
+				return (-1);
+			continue ;
 		}
 		else if (*line_read == '|')
 			i++;
@@ -140,6 +140,12 @@ int	open_all_heredocs(t_params *params, char *line_read)
 }
 
 /*
+			if (*(line_read + 1))
+			{
+				if (check_for_heredoc(params, i, &line_read) == -1)
+					return (-1);
+				continue ;
+			}
 		// if global var async == 1
 		// close all open fds, prepare to cleanup
 		// to move to next iteration of readline while loop

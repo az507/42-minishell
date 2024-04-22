@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 13:19:57 by achak             #+#    #+#             */
-/*   Updated: 2024/04/19 16:51:45 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 08:45:07 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	cleanup_in_child_process(t_params *params, char **envp, int *new_fds,
 //	{
 //		envp = create_envp_arr(*(params->head_env));
 //		execve(params->cmd_arr[i].cmd_args[0],
-//			params->cmd_arr[i].cmd_args, envp);
+//		nalsrams->cmd_arr[i].cmd_args, envp);
 //		perror(params->cmd_arr[i].cmd_args[0]);
 //		cleanup_in_child_process(params, envp, new_fds, old_fds);
 //		exit(EXIT_FAILURE);
@@ -69,7 +69,7 @@ int	child_process2(t_params *params, int i, int *new_fds, int *old_fds)
 	if (locate_command_names(params, i) == -1)
 	{
 		cleanup_in_child_process(params, NULL, new_fds, old_fds);
-		exit(EXIT_FAILURE);
+		exit(127);
 	}
 	settle_child_process_stdin(params, i, new_fds, old_fds);
 	settle_child_process_stdout(params, i, new_fds, old_fds);
@@ -106,6 +106,8 @@ int	child_process(t_params *params, int i, int *new_fds, int *old_fds)
 	char	**cmd_args;
 	int		rv;
 
+	if (old_fds || new_fds)
+		set_signals_to_dfl();
 	cmd_args = NULL;
 	rv = child_process1(params, i, new_fds, old_fds);
 	if (rv == -1)

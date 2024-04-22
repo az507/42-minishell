@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 10:41:27 by achak             #+#    #+#             */
-/*   Updated: 2024/04/17 17:31:21 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 10:13:52 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ char	*remove_last_bytes_from_str(char *str, int n)
 		new_str[str_len] = '\0';
 		while (++i < n)
 			new_str[i] = str[i];
-	}
+	}	create_new_entry(pwd, head_env);
+cd_builtin.c:			create_new_entry(oldpwd, hea
 	free(str);
 	return (new_str);
 }
@@ -56,8 +57,14 @@ void	cd_wrapper2(t_env **head_env, char *oldpwd, char *ch_path)
 	}
 	if (head_env)
 	{
-		update_existing_entry(oldpwd, head_env);
-		update_existing_entry(pwd, head_env);
+		if (!check_if_entry_exists(pwd, *head_env))
+			create_new_entry(pwd, head_env);
+		else
+			update_existing_entry(pwd, head_env);
+		if (!check_if_entry_exists(oldpwd, *head_env))
+			create_new_entry(oldpwd, head_env);
+		else
+			update_existing_entry(oldpwd, head_env);
 	}
 	free(pwd);
 }

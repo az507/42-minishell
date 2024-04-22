@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 17:16:53 by achak             #+#    #+#             */
-/*   Updated: 2024/04/18 17:40:24 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 09:33:45 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,14 @@ void	skip_til_end_of_quotes(char **line_read)
 	}
 }
 
-int	count_if_valid_pipe(char **line_read, int *flag, int *nbr)
+int	count_if_valid_pipe(char **line_read, t_env **head_env,
+		int *flag, int *nbr)
 {
 	if (*flag == -1 || check_syntax_around_pipe(line_read) == -1)
 	{
 		ft_dprintf(STDERR_FILENO,
 			"syntax error near unexpected token `%c'\n", '|');
+		update_syntax_error_exit_code(head_env);
 		return (-1);
 	}
 	(*nbr)++;
@@ -48,7 +50,7 @@ int	count_if_valid_pipe(char **line_read, int *flag, int *nbr)
 	return (0);
 }
 
-int	nbr_of_pipes(char *line_read)
+int	nbr_of_pipes(char *line_read, t_env **head_env)
 {
 	int	nbr;
 	int	flag;
@@ -66,7 +68,8 @@ int	nbr_of_pipes(char *line_read)
 			flag = 0;
 		else if (*line_read == '|')
 		{
-			if (count_if_valid_pipe(&line_read, &flag, &nbr) == -1)
+			if (count_if_valid_pipe(&line_read, head_env,
+					&flag, &nbr) == -1)
 				return (-2);
 			continue ;
 		}

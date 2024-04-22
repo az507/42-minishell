@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 10:14:56 by achak             #+#    #+#             */
-/*   Updated: 2024/03/31 19:03:15 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 09:13:24 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ void	create_new_entry(char *var, t_env **head)
 	char	*key;
 	char	*value;
 
+	if (!var)
+		return ;
 	new_node = (t_env *)malloc(sizeof(t_env));
 	if (!new_node)
 		return ;

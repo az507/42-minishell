@@ -6,11 +6,19 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 16:04:50 by achak             #+#    #+#             */
-/*   Updated: 2024/04/18 17:41:02 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 09:35:02 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
+
+void	update_syntax_error_exit_code(t_env **head_env)
+{
+	if (!check_if_entry_exists("?", *head_env))
+		create_new_entry("?=2", head_env);
+	else
+		update_existing_entry("?=2", head_env);
+}
 
 int	check_after_meta_char2(char **line_read)
 {
@@ -58,7 +66,7 @@ int	check_after_meta_char(char **line_read)
 	return (0);
 }
 
-int	check_redir_syntax(char *line_read)
+int	check_redir_syntax(char *line_read, t_env **head_env)
 {
 	int	flag;
 
@@ -77,6 +85,7 @@ int	check_redir_syntax(char *line_read)
 				ft_dprintf(STDERR_FILENO,
 					"syntax error near unexpected token `%c'\n",
 					*line_read);
+				update_syntax_error_exit_code(head_env);
 				return (-1);
 			}
 			continue ;

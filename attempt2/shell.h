@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 14:38:48 by achak             #+#    #+#             */
-/*   Updated: 2024/04/19 16:51:22 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 09:53:22 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,18 @@ typedef struct s_params
 {
 	char		*line_read;
 	t_command	*cmd_arr;
+	pid_t		*pid_arr;
 	int			cmd_nbr;
 	t_env		**head_env;
 }	t_params;
 
-//static volatile sig_atomic_t	async = 0;
-//volatile sig_atomic_t	loop = 0;
+//static volatile sig_atomic_t	g_async_flag = 0;
+
+extern int	g_async_flag;
 
 //	main.c
 int		split_raw_str_by_pipes(t_params *params, char *line_read);
+int		sigint_detected(t_params *params);
 void	main_shell_loop(t_params *params, char *line_read);
 
 //	count_len_til_pipe.c
@@ -74,9 +77,13 @@ void	count_chars_in_quoted_str(char **temp, int *count);
 int		count_len_til_pipe2(char **temp, int *flag, int *count);
 int		count_len_til_pipe(char *temp);
 
-//	misc_funcs_for_main.c
+//	signal_handlers.c
 void	signal_handler(int sig);
 void	set_up_signals(void);
+void	set_signals_to_dfl(void);
+void	non_interactive_signal_handler(void);
+
+//	misc_funcs_for_main.c
 void	init_cmd_arr(t_params *params, t_command *cmd_arr, int cmd_nbr,
 			char *line_read);
 void	init_params(t_params *params, t_env **head_env);
@@ -177,7 +184,7 @@ int		check_if_first_cmd_is_builtin(char *line_read, t_env *head_env);
 //	fork_and_execve.c
 void	wrapper(int func_rv, const char *func_name);
 void	fork_and_execve(t_params *params, int i, int *new_fds, int *old_fds);
-void	set_exit_status(t_params *params, int wstatus);
+void	set_exit_status(t_params *params, int wstatus, int mode);
 void	parent_waits_for_children(t_params *params, int *old_fds);
 void	preparing_fork_and_execve(t_params *params, char *line_read);
 
@@ -229,14 +236,16 @@ void	reset_flag_for_new_word(char **line_read, int *flag);
 
 //	nbr_of_pipes.c
 void	skip_til_end_of_quotes(char **line_read);
-int		count_if_valid_pipe(char **line_read, int *flag, int *nbr);
-int		nbr_of_pipes(char *line_read);
+int		count_if_valid_pipe(char **line_read, t_env **head_env, int *flag,
+			int *nbr);
+int		nbr_of_pipes(char *line_read, t_env **head_env);
 int		check_empty_line(char *line_read);
 
 //	check_syntax.c
+void	update_syntax_error_exit_code(t_env **head_env);
 int		check_after_meta_char2(char **line_read);
 int		check_after_meta_char(char **line_read);
-int		check_redir_syntax(char *line_read);
+int		check_redir_syntax(char *line_read, t_env **head_env);
 int		check_syntax_around_pipe(char **line_read);
 
 //	alloc_new_heredoc_copy.c
@@ -263,11 +272,17 @@ int		copy_delim_str_redir(char **line_read, char *delim, int *flag,
 void	copy_delim_str(char *line_read, char *delim, int flag, int i);
 char	*alloc_delim_str(char *line_read, int delim_len);
 
+//	heredoc_signals.c
+void	heredoc_sighandler(int sig);
+void	heredoc_signal_handler(void);
+void	free_heredoc_stuff(char *str, char *heredoc, char *delim, int fd1);
+int		cleanup_before_exiting_heredoc(t_params *params, int i);
+
 //	ft_heredoc.c
-void	save_heredoc_to_struct(t_command *cmd_arr, int fd1, int fd2,
+int		save_heredoc_to_struct(t_command *cmd_arr, int fd1, int fd2,
 			char *heredoc);
 int		check_heredoc_eof(char *str, char *delim);
-void	ft_heredoc(t_params *params, int i, char *delim, int flag);
+int		ft_heredoc(t_params *params, int i, char *delim, int flag);
 void	ignore_quotes_finding_other_heredocs(char **line_read, int *flag);
 int		is_heredoc_rightmost(char *line_read, int delim_len);
 
@@ -275,7 +290,7 @@ int		is_heredoc_rightmost(char *line_read, int delim_len);
 void	erase_quoted_portion_in_heredoc(char **line_read, int *flag);
 void	erase_heredoc_and_delim(char **line_read, int *flag);
 //void	erase_heredoc_and_delim(char **line_read, int *flag);
-void	check_for_heredoc(t_params *params, int i, char **line_read);
+int		check_for_heredoc(t_params *params, int i, char **line_read);
 void	ignore_quotes_looking_for_heredoc(char **line_read, int *flag);
 int		open_all_heredocs(t_params *params, char *line_read);
 

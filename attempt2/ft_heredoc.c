@@ -6,13 +6,13 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:10:12 by achak             #+#    #+#             */
-/*   Updated: 2024/04/19 16:28:25 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/21 18:14:16 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-void	save_heredoc_to_struct(t_command *cmd_arr, int fd1, int fd2,
+int	save_heredoc_to_struct(t_command *cmd_arr, int fd1, int fd2,
 		char *heredoc)
 {
 	if (cmd_arr->stdin_fd != -2)
@@ -27,6 +27,7 @@ void	save_heredoc_to_struct(t_command *cmd_arr, int fd1, int fd2,
 	cmd_arr->stdin_fd = fd2;
 	cmd_arr->heredoc = heredoc;
 	close(fd1);
+	return (0);
 }
 
 int	check_heredoc_eof(char *str, char *delim)
@@ -48,7 +49,7 @@ int	check_heredoc_eof(char *str, char *delim)
 	return (0);
 }
 
-void	ft_heredoc(t_params *params, int i, char *delim, int flag)
+int	ft_heredoc(t_params *params, int i, char *delim, int flag)
 {
 	static int	nbr = 0;
 	int			fd1;
@@ -59,19 +60,22 @@ void	ft_heredoc(t_params *params, int i, char *delim, int flag)
 	heredoc = strjoin_and_free_str(".tmpheredoc", ft_itoa(nbr++), 2);
 	fd1 = open(heredoc, O_WRONLY | O_TRUNC | O_CREAT, 0600);
 	fd2 = -2;
+	heredoc_signal_handler();
 	while (1)
 	{
 		str = get_next_line(STDIN_FILENO);
+		free_heredoc_stuff(str, heredoc, delim, fd1);
+		if (g_async_flag == 1)
+			return (cleanup_before_exiting_heredoc(params, i));
 		if (check_heredoc_eof(str, delim) == 1)
-		{
-			save_heredoc_to_struct(&params->cmd_arr[i], fd1, fd2, heredoc);
-			return ;
-		}
+			return (save_heredoc_to_struct
+				(&params->cmd_arr[i], fd1, fd2, heredoc));
 		if (!flag)
 			str = alloc_new_heredoc(str, params);
 		write(fd1, str, my_strlen(str));
 		free(str);
 	}
+	return (0);
 }
 
 void	ignore_quotes_finding_other_heredocs(char **line_read, int *flag)
