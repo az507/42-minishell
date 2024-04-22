@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 10:47:53 by achak             #+#    #+#             */
-/*   Updated: 2024/04/19 16:30:47 by achak            ###   ########.fr       */
+/*   Updated: 2024/04/22 16:30:29 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	open_new_files(t_params *params, int i, int open_mode, char *filename)
 		free(filename);
 		return (-1);
 	}
-	if (params->cmd_arr[i].heredoc_rightmost != 1)
+	if (params->cmd_arr[i].heredoc_rightmost != 1 && stdin_fd != -2)
 		params->cmd_arr[i].stdin_fd = stdin_fd;
 	else if (stdin_fd != -2)
 		close(stdin_fd);
