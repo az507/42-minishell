@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/21 11:29:29 by achak             #+#    #+#             */
-/*   Updated: 2024/04/22 15:55:23 by achak            ###   ########.fr       */
+/*   Updated: 2024/07/01 15:19:24 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,10 @@ void	cleanup_params(t_params *params)
 	if (params)
 	{
 		if (params->line_read)
+		{
+			//rl_clear_history();
 			free(params->line_read);
+		}
 		if (params->cmd_arr)
 			free_cmd_arr(params->cmd_arr, params->cmd_nbr);
 		if (params->pid_arr)
