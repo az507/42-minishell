@@ -1,7 +1,7 @@
  # Minishell
 
 A simplified Unix shell implemented in C as part of the 42 School curriculum.  
-Minishell replicates the behavior of a standard shell, including parsing, executing built-in commands, managing processes, and handling redirections and signals.
+Minishell replicates the behavior of a standard shell, including parsing, executing built-in commands, managing processes, and handling redirections/heredocs and signals.
 
 ## Project Overview
 
@@ -27,11 +27,17 @@ Minishell is a project designed to deepen understanding of Unix systems programm
 - C compiler (compatible with `cc`)
 - POSIX-compliant terminal
 
-## Usage
-
+## Dependencies
+Ubuntu:
 ```bash
-make-docker
+sudo apt-get update && sudo apt-get install -y libncurses-dev libreadline-dev
 ```
+## Usage
+Docker:
+```bash
+make docker # host filesystem is bind-mounted at /hostfs in docker container as read-only
+```
+GNU/Linux:
 ```bash
 git clone https://github.com/az507/42-minishell.git
 cd 42-minishell
