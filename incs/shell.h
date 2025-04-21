@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/05 14:38:48 by achak             #+#    #+#             */
-/*   Updated: 2024/04/22 15:48:00 by achak            ###   ########.fr       */
+/*   Updated: 2024/08/22 19:18:42 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "get_next_line.h"
+# include "libft.h"
 
 typedef struct s_env
 {

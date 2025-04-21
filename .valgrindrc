@@ -1,0 +1,9 @@
+<<<<<<< HEAD
+--suppressions=readline.supp
+--leak-check=full
+--show-leak-kinds=all
+=======
+--leak-check=full
+--show-leak-kinds=all
+--suppressions=incs/readline.supp
+>>>>>>> anzi

@@ -6,7 +6,7 @@
 /*   By: achak <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 13:19:57 by achak             #+#    #+#             */
-/*   Updated: 2024/04/22 16:30:51 by achak            ###   ########.fr       */
+/*   Updated: 2024/07/01 15:19:17 by achak            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ void	cleanup_in_child_process(t_params *params, char **envp, int *new_fds,
 		free_array(envp);
 	if (new_fds || old_fds)
 	{
+		rl_clear_history();
 		free_symbol_table(params->head_env);
 		cleanup_params(params);
 		free(old_fds);
-		rl_clear_history();
 		return ;
 	}
 	cleanup_params(params);
@@ -59,6 +59,11 @@ void	call_execve(t_params *params, int i, int *new_fds, int *old_fds)
 	else
 		execve(params->cmd_arr[i].cmd_args[0],
 			params->cmd_arr[i].cmd_args, envp);
+	if (g_async_flag == 1)
+	{
+		cleanup_in_child_process(params, envp, new_fds, old_fds);
+		exit(130);
+	}
 	perror(params->cmd_arr[i].cmd_args[0]);
 	cleanup_in_child_process(params, envp, new_fds, old_fds);
 	exit(EXIT_FAILURE);
@@ -101,13 +106,34 @@ int	child_process1(t_params *params, int i, int *new_fds, int *old_fds)
 	return (0);
 }
 
+void	child_process_signal_handler(int sig)
+{
+	//if (sig == SIGINT || sig == SIGQUIT)
+	if (sig == SIGINT)
+		g_async_flag = 1;
+}
+
+void	set_signals_for_child_process(void)
+{
+	struct sigaction	act;
+
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	act.sa_handler = &child_process_signal_handler;
+	if (sigaction(SIGINT, &act, NULL) == -1)
+		perror("sigaction");
+//	if (sigaction(SIGQUIT, &act, NULL) == -1)
+//		perror("sigaction");
+}
+
 int	child_process(t_params *params, int i, int *new_fds, int *old_fds)
 {
 	char	**cmd_args;
 	int		rv;
 
 	if (old_fds || new_fds)
-		set_signals_to_dfl();
+		set_signals_for_child_process();
+		//set_signals_to_dfl();
 	cmd_args = NULL;
 	rv = child_process1(params, i, new_fds, old_fds);
 	if (rv == -1)

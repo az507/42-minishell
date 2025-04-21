@@ -11,29 +11,35 @@
 # **************************************************************************** #
 
 NAME	= minishell
-CC1	= cc -g -Wall -Werror -Wextra
-CC2	= cc -g -Wall -Werror -Wextra -fsanitize=memory
-#CC2	= cc -g -Wall -Werror -Wextra -fsanitize=address -fno-omit-frame-pointer \
-	  -fno-optimize-sibling-calls
-SRCS	= $(wildcard *.c)
+CC	= cc
+CFLAGS	= -Wall -Werror -Wextra -g -Iincs -I$(LIBFTDIR)
+LFLAGS	= -L$(LIBFTDIR) -lreadline -lft
+SRCS	= $(shell find . -name "*.c" | grep -v -e '$(LIBFTDIR)')
+OBJ_DIR	= objs
+OBJS	= $(addprefix $(OBJ_DIR)/,$(notdir $(SRCS:.c=.o)))
+LIBFTDIR= incs/libft
+LIBFT	= $(LIBFTDIR)/libft.a
+VPATH	= $(sort $(dir $(SRCS)))
 
 all:	$(NAME)
 
-$(NAME):$(SRCS)
-	$(CC1) $(SRCS) -o $(NAME) -lreadline
+$(NAME):$(LIBFT) $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LFLAGS)
 
-test1:
-	make re && clear && valgrind ./$(NAME)
+$(LIBFT):
+	make -C$(LIBFTDIR)
 
-test2:
-	make re && clear && ./$(NAME)
+$(OBJ_DIR)/%.o:%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-ifneq ("$(wildcard $(NAME))","")
-	rm $(NAME)
-endif
+	rm -rf $(OBJ_DIR)
+	make -C$(LIBFTDIR) clean
 
 fclean:	clean
+	rm -f $(NAME)
+	make -C$(LIBFTDIR) fclean
 
 re:	fclean all
 
