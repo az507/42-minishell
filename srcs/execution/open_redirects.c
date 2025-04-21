@@ -14,6 +14,7 @@
 
 int	perror_filename(char *filename, int open_mode)
 {
+    (void)filename;
 	if (open_mode == 1)
 		filename = ">>";
 	else if (open_mode == 2)
@@ -54,12 +55,10 @@ int	open_new_files(t_params *params, int i, int open_mode, char *filename)
 int	settle_redirects(t_params *params, int i, char **temp)
 {
 	int		open_mode;
-	int		fd;
 	int		flag;
 	char	*filename;
 
 	open_mode = check_type_of_redirect(*temp);
-	fd = -1;
 	flag = 0;
 	filename = expand_filename(params, *temp);
 	if (!filename)

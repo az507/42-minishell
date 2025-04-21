@@ -17,7 +17,8 @@ void	count_meta_char(char **temp_line, int *token_len)
 	(*token_len)++;
 	if (**temp_line == '|')
 		(*token_len)++;
-	else if (*temp_line + 1)
+	// old version: else if (*temp_line + 1)
+	else if (*(temp_line + 1))
 	{
 		if (*(*temp_line + 1) != '<' && *(*temp_line + 1) != '>')
 			(*token_len)++;

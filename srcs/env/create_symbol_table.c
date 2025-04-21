@@ -55,11 +55,9 @@ char	*get_value_from_var(char *var)
 {
 	char	*value;
 	int		i;
-	int		j;
 	int		flag;
 
 	i = -1;
-	j = -1;
 	flag = 0;
 	while (*var)
 	{

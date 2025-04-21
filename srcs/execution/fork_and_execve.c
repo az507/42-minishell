@@ -67,11 +67,9 @@ void	set_exit_status(t_params *params, int wstatus, int mode)
 
 void	parent_waits_for_children(t_params *params, int *old_fds)
 {
-	char	*exit_str;
 	int		wstatus;
 	int		j;
 
-	exit_str = NULL;
 	j = 0;
 	if (old_fds)
 		free(old_fds);

@@ -16,7 +16,8 @@ void	iterate_thru_meta_char(char **temp, int *count, int *flag)
 {
 	if (**temp == '|')
 		(*count)++;
-	else if (*temp + 1)
+	// old version: else if (*temp + 1)
+	else if (*(temp + 1))
 	{
 		if (*(*temp + 1) != '<' && *(*temp + 1) != '>')
 			(*count)++;

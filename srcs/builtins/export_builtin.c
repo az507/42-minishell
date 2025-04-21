@@ -116,10 +116,8 @@ int	export_var_into_env_list(t_env **head_env, char **cmd_args)
 
 int	export_builtin(t_env **head_env, char **cmd_args)
 {
-	int		flag;
 	t_env	*temp;
 
-	flag = 0;
 	if (!cmd_args[1])
 	{
 		temp = *head_env;

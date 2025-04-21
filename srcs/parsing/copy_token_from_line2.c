@@ -17,7 +17,8 @@ void	copy_meta_char(char **temp, char *token_arr, int *i)
 	token_arr[++(*i)] = 39;
 	if (**temp == '|')
 		token_arr[++(*i)] = **temp;
-	else if (*temp + 1)
+	// old version: else if (*temp + 1)
+	else if (*(temp + 1))
 	{
 		if (*(*temp + 1) != '<' && *(*temp + 1) != '>')
 			token_arr[++(*i)] = **temp;

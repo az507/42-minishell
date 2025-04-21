@@ -86,10 +86,8 @@ int	determine_whats_first_word(char *line_read, t_env *head_env)
 
 int	check_if_first_cmd_is_builtin(char *line_read, t_env *head_env)
 {
-	int		flag;
 	char	*temp;
 
-	flag = 0;
 	temp = line_read;
 	while (*temp)
 	{
@@ -102,8 +100,8 @@ int	check_if_first_cmd_is_builtin(char *line_read, t_env *head_env)
 		}
 		else if (!is_whitespace(*temp))
 			return (determine_whats_first_word(line_read, head_env));
-		else if (is_whitespace(*temp))
-			;
+//		else if (is_whitespace(*temp))
+//            ;
 		temp++;
 	}
 	return (0);

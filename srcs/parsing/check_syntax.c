@@ -68,9 +68,6 @@ int	check_after_meta_char(char **line_read)
 
 int	check_redir_syntax(char *line_read, t_env **head_env)
 {
-	int	flag;
-
-	flag = 0;
 	while (*line_read)
 	{
 		if (*line_read == 39 || *line_read == '"')

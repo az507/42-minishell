@@ -12,9 +12,10 @@
 
 NAME	= minishell
 CC	= cc
-CFLAGS	= -Wall -Werror -Wextra -g -Iincs -I$(LIBFTDIR)
-LFLAGS	= -L$(LIBFTDIR) -lreadline -lft
-SRCS	= $(shell find . -name "*.c" | grep -v -e '$(LIBFTDIR)')
+CFLAGS	= -Wall -Werror -Wextra -Iincs -I$(LIBFTDIR)
+LFLAGS	= -L$(LIBFTDIR)
+LDFLAGS = -lreadline -lft
+SRCS	= $(shell find srcs -type f -name "*.c")
 OBJ_DIR	= objs
 OBJS	= $(addprefix $(OBJ_DIR)/,$(notdir $(SRCS:.c=.o)))
 LIBFTDIR= incs/libft
@@ -24,7 +25,7 @@ VPATH	= $(sort $(dir $(SRCS)))
 all:	$(NAME)
 
 $(NAME):$(LIBFT) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LFLAGS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LFLAGS) $(LDFLAGS) $(XTRAFLAGS)
 
 $(LIBFT):
 	make -C$(LIBFTDIR)
@@ -43,4 +44,16 @@ fclean:	clean
 
 re:	fclean all
 
-.PHONY:	all clean fclean re
+docker:
+	docker build -t minishell .
+ifeq ($(shell uname),Linux)
+	docker run --rm -it --name minishell -v '/:/hostfs:ro' minishell
+else ifeq ($(shell uname),Darwin)
+	docker run --rm -it --name minishell -v '/Users:/hostfs:ro' minishell
+endif
+
+docker-clean:
+	-docker kill minishell
+	-docker rmi minishell
+
+.PHONY:	all clean fclean re docker docker-clean

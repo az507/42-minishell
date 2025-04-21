@@ -13,7 +13,7 @@
 NAME = libft.a
 CC = cc
 INCLUDE = libft.h
-FLAGS = -g -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror
 #OTHERS = $(shell ls -l | grep '^d' | awk '{print $NF}')
 AR = ar rc
 MAKE = make

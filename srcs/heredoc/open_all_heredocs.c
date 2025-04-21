@@ -67,10 +67,8 @@ int	check_for_heredoc(t_params *params, int i, char **line_read)
 {
 	int		delim_len;
 	int		flag;
-	int		j;
 	char	*delim;
 
-	j = 0;
 	delim = NULL;
 	if (*(*line_read + 1) == '<')
 	{
