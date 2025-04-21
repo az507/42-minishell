@@ -53,7 +53,7 @@ else ifeq ($(shell uname),Darwin)
 endif
 
 docker-clean:
-	-docker kill minishell
-	-docker rmi minishell
+	-@docker kill minishell 2> /dev/null
+	-@docker rmi minishell 2> /dev/null
 
 .PHONY:	all clean fclean re docker docker-clean
